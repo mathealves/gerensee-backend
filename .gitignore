@@ -1,0 +1,14 @@
+# node
+node_modules
+
+# env
+.env
+.env.*
+!.env.example
+
+# prisma
+/generated/prisma
+
+# editor
+.vscode
+.idea
