@@ -8,10 +8,11 @@ This repository contains the backend application, built with **Node.js** and **P
 
 ## Tech Stack
 
-- **Node.js**
+- **Node.js** 
+- **NestJS**
 - **Prisma ORM**
-- **PostgreSQL**
-- **pnpm** (package manager)
+- **PostgreSQL** 
+- **pnpm** 
 
 ---
 
@@ -19,7 +20,7 @@ This repository contains the backend application, built with **Node.js** and **P
 
 ### Requirements
 - Node.js
-- pnpm (`pnpm@10.28.1`)
+- pnpm (`@10.28.1`)
 
 ### Install dependencies
 ```bash
