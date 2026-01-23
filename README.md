@@ -18,15 +18,31 @@ This repository contains the backend application, built with **Node.js** and **P
 ## Getting Started
 
 ### Requirements
-- Node.js (LTS recommended)
+- Node.js
 - pnpm (`pnpm@10.28.1`)
-- PostgreSQL
 
 ### Install dependencies
 ```bash
 pnpm install
 ```
-### Prisma Setup
+## Local database setup
+
+### Start PostgreSQL with Docker Compose
 ```bash
-npx prisma generate
+docker compose up -d
+```
+
+### Apply migrations
+```bash
+pnpm prisma:migrate:dev
+```
+
+### Generate Prisma Client
+```bash
+pnpm prisma:generate
+```
+
+### Seed the database
+```bash
+pnpm prisma:seed
 ```

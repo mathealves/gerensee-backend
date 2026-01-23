@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "postinstall": "prisma generate",
-    "prisma:seed": "npx prisma db seed"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "npx prisma migrate dev",
+    "prisma:seed": "npx prisma db seed",
+    "prisma:studio": "npx prisma studio"
   },
   "keywords": [],
   "author": "",
