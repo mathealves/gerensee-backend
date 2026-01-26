@@ -38,6 +38,7 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   memberships Member[]
 }
@@ -46,6 +47,7 @@ model Organization {
   id        String   @id @default(uuid())
   name      String   @unique
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   members   Member[]
   projects  Project[]
@@ -54,6 +56,8 @@ model Organization {
 model Member {
   id             String @id @default(uuid())
   role           Role
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   userId         String
   organizationId String
@@ -90,13 +94,15 @@ model Project {
 
 model ProjectMember {
   id        String @id @default(uuid())
-
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   projectId String
   memberId  String
 
   project   Project @relation(fields: [projectId], references: [id])
   member    Member  @relation(fields: [memberId], references: [id])
-  assignedTasks TaskAssignee[]
+
+  taskAssignments TaskAssignments[]
   documentsLocks Document[]
 
   @@unique([projectId, memberId])
@@ -130,10 +136,10 @@ model Task {
   project      Project    @relation(fields: [projectId], references: [id])
   status       TaskStatus @relation(fields: [statusId], references: [id])
 
-  assignees    TaskAssignee[]
+  assignments    TaskAssignments[]
 }
 
-model TaskAssignee {
+model TaskAssignments {
   id       String @id @default(uuid())
 
   taskId   String
