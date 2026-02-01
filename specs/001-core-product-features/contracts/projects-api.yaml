@@ -1,0 +1,484 @@
+openapi: 3.0.3
+info:
+  title: Gerensee API - Projects
+  description: Project and project membership management endpoints
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+tags:
+  - name: Projects
+    description: Project management
+  - name: Project Members
+    description: Project membership management
+
+paths:
+  /organizations/{organizationId}/projects:
+    post:
+      tags:
+        - Projects
+      summary: Create project
+      description: Create a new project within organization (requires OWNER or ADMIN role)
+      operationId: createProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                  example: Q1 Roadmap
+                description:
+                  type: string
+                  maxLength: 1000
+                  example: Planning for Q1 2026 initiatives
+      responses:
+        '201':
+          description: Project created (with default task statuses)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Validation error
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Project name already exists in organization
+    
+    get:
+      tags:
+        - Projects
+      summary: List projects
+      description: Get all projects in organization (accessible to user)
+      operationId: listProjects
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/OrganizationId'
+      responses:
+        '200':
+          description: Projects retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /projects/{projectId}:
+    get:
+      tags:
+        - Projects
+      summary: Get project details
+      description: Get project with task statuses
+      operationId: getProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Project'
+                  - type: object
+                    properties:
+                      statuses:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/TaskStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    patch:
+      tags:
+        - Projects
+      summary: Update project
+      description: Update project name or description (requires OWNER or ADMIN)
+      operationId: updateProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 200
+                description:
+                  type: string
+                  maxLength: 1000
+      responses:
+        '200':
+          description: Project updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      tags:
+        - Projects
+      summary: Delete project
+      description: Delete project and all tasks/documents (requires OWNER or ADMIN)
+      operationId: deleteProject
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '204':
+          description: Project deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{projectId}/members:
+    get:
+      tags:
+        - Project Members
+      summary: List project members
+      description: Get all members assigned to project
+      operationId: listProjectMembers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Project members retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectMember'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    
+    post:
+      tags:
+        - Project Members
+      summary: Add member to project
+      description: Assign organization member to project (requires OWNER or ADMIN)
+      operationId: addProjectMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+                  description: User ID (must be organization member)
+      responses:
+        '201':
+          description: Member added to project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectMember'
+        '400':
+          description: User not in organization
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: User already in project
+
+  /projects/{projectId}/members/{projectMemberId}:
+    delete:
+      tags:
+        - Project Members
+      summary: Remove member from project
+      description: Remove user from project (requires OWNER or ADMIN)
+      operationId: removeProjectMember
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: projectMemberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Member removed from project
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /projects/{projectId}/statuses:
+    post:
+      tags:
+        - Projects
+      summary: Create task status
+      description: Add custom task status/column (requires OWNER or ADMIN)
+      operationId: createTaskStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - position
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                  example: In Review
+                position:
+                  type: integer
+                  minimum: 0
+                  example: 2
+                color:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+                  example: '#4CAF50'
+      responses:
+        '201':
+          description: Task status created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
+        '400':
+          description: Validation error or position conflict
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /projects/{projectId}/statuses/{statusId}:
+    patch:
+      tags:
+        - Projects
+      summary: Update task status
+      description: Update status name, position, or color
+      operationId: updateTaskStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: statusId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                position:
+                  type: integer
+                  minimum: 0
+                color:
+                  type: string
+                  pattern: '^#[0-9A-Fa-f]{6}$'
+      responses:
+        '200':
+          description: Task status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      tags:
+        - Projects
+      summary: Delete task status
+      description: Delete status if no tasks reference it
+      operationId: deleteTaskStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: statusId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Task status deleted
+        '400':
+          description: Cannot delete status with tasks
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  schemas:
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clx1234567890abcdef
+        name:
+          type: string
+          example: Q1 Roadmap
+        description:
+          type: string
+          nullable: true
+        organizationId:
+          type: string
+        createdById:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    ProjectMember:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        userId:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+        addedAt:
+          type: string
+          format: date-time
+    
+    TaskStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clx1234567890abcdef
+        name:
+          type: string
+          example: In Progress
+        position:
+          type: integer
+          example: 1
+        color:
+          type: string
+          nullable: true
+          example: '#2196F3'
+        projectId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+  parameters:
+    OrganizationId:
+      name: organizationId
+      in: path
+      required: true
+      schema:
+        type: string
+    
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    
+    Forbidden:
+      description: Forbidden - insufficient permissions or not project member
+    
+    NotFound:
+      description: Resource not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,438 @@
+openapi: 3.0.3
+info:
+  title: Gerensee API - Tasks
+  description: Task management and Kanban board endpoints
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+tags:
+  - name: Tasks
+    description: Task management
+  - name: Board
+    description: Kanban board operations
+
+paths:
+  /projects/{projectId}/tasks:
+    post:
+      tags:
+        - Tasks
+      summary: Create task
+      description: Create a new task in project
+      operationId: createTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - statusId
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                  example: Fix login bug
+                description:
+                  type: string
+                  maxLength: 5000
+                  example: Users cannot login with special characters in password
+                statusId:
+                  type: string
+                  description: Task status/column ID
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                dueDate:
+                  type: string
+                  format: date-time
+                  nullable: true
+                assigneeIds:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of user IDs to assign (must be project members)
+      responses:
+        '201':
+          description: Task created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error or assignee not in project
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    
+    get:
+      tags:
+        - Tasks
+      summary: List project tasks
+      description: Get all tasks in project with optional filters
+      operationId: listTasks
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: statusId
+          in: query
+          schema:
+            type: string
+          description: Filter by status
+        - name: assignedToMe
+          in: query
+          schema:
+            type: boolean
+          description: Show only tasks assigned to current user
+        - name: priority
+          in: query
+          schema:
+            $ref: '#/components/schemas/TaskPriority'
+          description: Filter by priority
+      responses:
+        '200':
+          description: Tasks retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /projects/{projectId}/board:
+    get:
+      tags:
+        - Board
+      summary: Get Kanban board
+      description: Get project board with all statuses and tasks organized by column
+      operationId: getBoard
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Board retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project:
+                    $ref: '#/components/schemas/Project'
+                  columns:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          $ref: '#/components/schemas/TaskStatus'
+                        tasks:
+                          type: array
+                          items:
+                            $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /tasks/{taskId}:
+    get:
+      tags:
+        - Tasks
+      summary: Get task details
+      description: Get single task with full details
+      operationId: getTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '200':
+          description: Task retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    patch:
+      tags:
+        - Tasks
+      summary: Update task
+      description: Update task fields (title, description, status, priority, due date)
+      operationId: updateTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 500
+                description:
+                  type: string
+                  maxLength: 5000
+                statusId:
+                  type: string
+                  description: Move task to different status/column
+                priority:
+                  $ref: '#/components/schemas/TaskPriority'
+                dueDate:
+                  type: string
+                  format: date-time
+                  nullable: true
+      responses:
+        '200':
+          description: Task updated (triggers WebSocket event for board updates)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '400':
+          description: Validation error
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    delete:
+      tags:
+        - Tasks
+      summary: Delete task
+      description: Delete task permanently
+      operationId: deleteTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      responses:
+        '204':
+          description: Task deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /tasks/{taskId}/assign:
+    post:
+      tags:
+        - Tasks
+      summary: Assign user to task
+      description: Add user assignment to task
+      operationId: assignTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: string
+                  description: User to assign (must be project member)
+      responses:
+        '201':
+          description: User assigned to task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskAssignment'
+        '400':
+          description: User not in project or already assigned
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /tasks/{taskId}/assignments/{assignmentId}:
+    delete:
+      tags:
+        - Tasks
+      summary: Unassign user from task
+      description: Remove user assignment
+      operationId: unassignTask
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TaskId'
+        - name: assignmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: User unassigned
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clx1234567890abcdef
+        title:
+          type: string
+          example: Fix login bug
+        description:
+          type: string
+          nullable: true
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        dueDate:
+          type: string
+          format: date-time
+          nullable: true
+        statusId:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        projectId:
+          type: string
+        organizationId:
+          type: string
+        createdById:
+          type: string
+        assignments:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskAssignment'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    TaskAssignment:
+      type: object
+      properties:
+        id:
+          type: string
+        taskId:
+          type: string
+        userId:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+        assignedById:
+          type: string
+        assignedAt:
+          type: string
+          format: date-time
+    
+    TaskPriority:
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
+        - URGENT
+      default: MEDIUM
+    
+    TaskStatus:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        position:
+          type: integer
+        color:
+          type: string
+          nullable: true
+        projectId:
+          type: string
+    
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+    
+    TaskId:
+      name: taskId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    
+    Forbidden:
+      description: Forbidden - insufficient permissions or not project member
+    
+    NotFound:
+      description: Resource not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
