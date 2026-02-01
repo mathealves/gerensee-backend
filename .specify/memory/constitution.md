@@ -65,6 +65,21 @@ YAGNI applies unless violating it would endanger core invariants or future evolu
 
 ---
 
+## Implementation Standards
+
+### Input Validation
+All input validation must be handled declaratively using class-validator decorators on DTO classes.
+
+- DTOs must be classes, not interfaces or plain types
+- Validation rules must be explicit via decorators (@IsEmail, @MinLength, @IsNotEmpty, etc.)
+- Validation must occur at the API boundary (controller layer) via ValidationPipe
+- Business logic layers (services, repositories) must not perform input format validation
+- Custom validation messages should be clear and actionable
+
+Rationale: Separates transport-layer validation from domain logic, ensures consistent validation across all entry points, and leverages NestJS framework capabilities.
+
+---
+
 ## Development and Change Process
 
 - Every meaningful change to domain rules or invariants must be accompanied by a written specification.
@@ -86,6 +101,6 @@ Any change to the constitution must:
 All specifications, plans, tasks, and implementations must comply with this document.
 Operational guidance and tooling preferences belong in auxiliary documents, not here.
 
-**Version**: 1.0.0  
+**Version**: 1.1.0  
 **Ratified**: 2026-01-30  
-**Last Amended**: 2026-01-30
+**Last Amended**: 2026-02-01

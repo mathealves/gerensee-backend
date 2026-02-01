@@ -47,3 +47,10 @@ pnpm prisma:generate
 ```bash
 pnpm prisma:seed
 ```
+
+## Running application locally
+
+```bash
+pnpm start:dev
+```
+
