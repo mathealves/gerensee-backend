@@ -7,7 +7,7 @@ export class OrganizationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   create(data: Prisma.OrganizationCreateInput): Promise<Organization> {
-    return this.prisma.client.organization.create({ data });
+    return this.prisma.organization.create({ data });
   }
   OrganizationsRepository;
 }
