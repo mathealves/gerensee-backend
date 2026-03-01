@@ -19,7 +19,7 @@ import {
 import { OrganizationsService } from './organizations.service';
 import { Organization, Member } from '../../generated/prisma/client';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { CurrentUser, CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
+import { CurrentUser, type CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
 
 @Controller('organizations')
 @UseGuards(JwtAuthGuard)

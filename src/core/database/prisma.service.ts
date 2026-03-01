@@ -29,26 +29,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async onModuleInit() {
     await this.$connect();
-    
-    // Prisma middleware for multi-tenant awareness
-    // Note: Actual tenant scoping is handled explicitly in repositories/services
-    // This middleware provides logging and can be enhanced for automatic scoping
-    this.$use(async (params, next) => {
-      const tenantModels = ['Project', 'Task', 'Document'];
-      
-      // Log queries on tenant-scoped models in development for debugging
-      if (process.env.NODE_ENV === 'development' && tenantModels.includes(params.model || '')) {
-        const hasOrgId = params.args?.where?.organizationId || params.args?.data?.organizationId;
-        if (!hasOrgId && !['aggregate', 'count'].includes(params.action)) {
-          console.warn(
-            `[Multi-Tenant Warning] Query on ${params.model} without organizationId: ${params.action}`,
-            JSON.stringify(params.args)
-          );
-        }
-      }
-      
-      return next(params);
-    });
   }
 
   async onModuleDestroy() {
