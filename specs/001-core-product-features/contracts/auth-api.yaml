@@ -36,6 +36,7 @@ paths:
                 - email
                 - password
                 - name
+                - organizationName
               properties:
                 email:
                   type: string
@@ -51,6 +52,11 @@ paths:
                   minLength: 2
                   maxLength: 100
                   example: John Doe
+                organizationName:
+                  type: string
+                  minLength: 2
+                  maxLength: 100
+                  example: Acme Corp
       responses:
         '201':
           description: User registered successfully
