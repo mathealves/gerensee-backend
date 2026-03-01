@@ -43,11 +43,6 @@ pnpm prisma:migrate:dev
 pnpm prisma:generate
 ```
 
-### Seed the database
-```bash
-pnpm prisma:seed
-```
-
 ## Running application locally
 
 ```bash

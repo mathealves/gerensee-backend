@@ -19,16 +19,16 @@
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Install NestJS dependencies (@nestjs/core, @nestjs/common, @nestjs/platform-express) per plan.md
-- [ ] T002 [P] Install Prisma dependencies (@prisma/client, prisma) per plan.md
-- [ ] T003 [P] Install authentication dependencies (@nestjs/passport, @nestjs/jwt, passport-jwt, bcrypt, jsonwebtoken) per plan.md
-- [ ] T004 [P] Install WebSocket dependencies (@nestjs/websockets, @nestjs/platform-socket.io, socket.io) per plan.md
-- [ ] T005 [P] Install validation dependencies (class-validator, class-transformer) per plan.md
-- [ ] T006 [P] Install testing dependencies (jest, supertest, @nestjs/testing) per plan.md
-- [ ] T007 [P] Configure TypeScript compiler options in tsconfig.json per plan.md
-- [ ] T008 [P] Configure ESLint rules in eslint.config.mjs per plan.md
-- [ ] T009 [P] Create environment configuration template (.env.example) with DATABASE_URL, JWT secrets per quickstart.md
-- [ ] T010 Create Docker Compose file with PostgreSQL service per quickstart.md
+- [x] T001 Install NestJS dependencies (@nestjs/core, @nestjs/common, @nestjs/platform-express) per plan.md
+- [x] T002 [P] Install Prisma dependencies (@prisma/client, prisma) per plan.md
+- [x] T003 [P] Install authentication dependencies (@nestjs/passport, @nestjs/jwt, passport-jwt, bcrypt, jsonwebtoken) per plan.md
+- [x] T004 [P] Install WebSocket dependencies (@nestjs/websockets, @nestjs/platform-socket.io, socket.io) per plan.md
+- [x] T005 [P] Install validation dependencies (class-validator, class-transformer) per plan.md
+- [x] T006 [P] Install testing dependencies (jest, supertest, @nestjs/testing) per plan.md
+- [x] T007 [P] Configure TypeScript compiler options in tsconfig.json per plan.md
+- [x] T008 [P] Configure ESLint rules in eslint.config.mjs per plan.md
+- [x] T009 [P] Create environment configuration template (.env.example) with DATABASE_URL, JWT secrets per quickstart.md
+- [x] T010 Create Docker Compose file with PostgreSQL service per quickstart.md
 
 ---
 
@@ -38,27 +38,27 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T011 Create Prisma schema with all entities (User, Organization, Member, RefreshToken, Project, ProjectMember, TaskStatus, Task, TaskAssignment, Document, DocumentLock) in prisma/schema.prisma per data-model.md
-- [ ] T012 Add enums (Role, TaskPriority) to Prisma schema per data-model.md
-- [ ] T013 Add all indexes (unique, composite, partial) to Prisma schema per data-model.md §Indexes
-- [ ] T014 Add cascade delete rules to Prisma schema per data-model.md §Cascade Rules
-- [ ] T015 Run initial Prisma migration: `pnpm prisma migrate dev --name init`
-- [ ] T016 Add partial unique index for OWNER role via raw SQL in migration per data-model.md §Member
-- [ ] T017 Create PrismaService in src/core/database/prisma.service.ts with client instantiation per quickstart.md
-- [ ] T018 Implement Prisma middleware for multi-tenant organization scoping in src/core/database/prisma.service.ts per research.md §Multi-Tenancy
-- [ ] T019 Create DatabaseModule in src/core/database/database.module.ts exporting PrismaService
-- [ ] T020 Create JWT strategy in src/core/auth/strategies/jwt.strategy.ts validating access tokens per quickstart.md §JWT Token Strategy
-- [ ] T021 [P] Create JwtAuthGuard in src/core/auth/guards/jwt-auth.guard.ts per quickstart.md
-- [ ] T022 [P] Create RolesGuard in src/core/auth/guards/roles.guard.ts checking JWT role per quickstart.md §RBAC
-- [ ] T023 [P] Create @CurrentUser decorator in src/core/auth/decorators/current-user.decorator.ts extracting user from request per quickstart.md
-- [ ] T024 [P] Create @Roles decorator in src/core/auth/decorators/roles.decorator.ts for RBAC metadata per quickstart.md
-- [ ] T025 Create AuthService in src/core/auth/auth.service.ts with login(), refreshAccessToken(), logout(), logoutAllDevices() methods per quickstart.md §Auth Service Implementation
-- [ ] T026 Create AuthScheduler in src/core/auth/auth.scheduler.ts with daily cron job to cleanup expired refresh tokens per quickstart.md §Cleanup Job
-- [ ] T027 Create AuthController in src/core/auth/auth.controller.ts with POST /auth/register, POST /auth/login, POST /auth/refresh, POST /auth/logout, GET /auth/me endpoints per contracts/auth-api.yaml
-- [ ] T028 Create AuthModule in src/core/auth/auth.module.ts importing PassportModule, JwtModule, DatabaseModule and registering all auth components
-- [ ] T029 [P] Create global exception filter in src/core/common/filters/http-exception.filter.ts per plan.md
-- [ ] T030 [P] Create validation pipe in src/core/common/pipes/validation.pipe.ts per plan.md
-- [ ] T031 Update AppModule in src/app.module.ts to import DatabaseModule, AuthModule and register global filters/pipes
+- [x] T011 Create Prisma schema with all entities (User, Organization, Member, RefreshToken, Project, ProjectMember, TaskStatus, Task, TaskAssignment, Document, DocumentLock) in prisma/schema.prisma per data-model.md
+- [x] T012 Add enums (Role, TaskPriority) to Prisma schema per data-model.md
+- [x] T013 Add all indexes (unique, composite, partial) to Prisma schema per data-model.md §Indexes
+- [x] T014 Add cascade delete rules to Prisma schema per data-model.md §Cascade Rules
+- [x] T015 Run initial Prisma migration: `pnpm prisma migrate dev --name init`
+- [x] T016 Add partial unique index for OWNER role via raw SQL in migration per data-model.md §Member
+- [x] T017 Create PrismaService in src/core/database/prisma.service.ts with client instantiation per quickstart.md
+- [x] T018 Implement Prisma middleware for multi-tenant organization scoping in src/core/database/prisma.service.ts per research.md §Multi-Tenancy
+- [x] T019 Create DatabaseModule in src/core/database/database.module.ts exporting PrismaService
+- [x] T020 Create JWT strategy in src/core/auth/strategies/jwt.strategy.ts validating access tokens per quickstart.md §JWT Token Strategy
+- [x] T021 [P] Create JwtAuthGuard in src/core/auth/guards/jwt-auth.guard.ts per quickstart.md
+- [x] T022 [P] Create RolesGuard in src/core/auth/guards/roles.guard.ts checking JWT role per quickstart.md §RBAC
+- [x] T023 [P] Create @CurrentUser decorator in src/core/auth/decorators/current-user.decorator.ts extracting user from request per quickstart.md
+- [x] T024 [P] Create @Roles decorator in src/core/auth/decorators/roles.decorator.ts for RBAC metadata per quickstart.md
+- [x] T025 Create AuthService in src/core/auth/auth.service.ts with login(), refreshAccessToken(), logout(), logoutAllDevices() methods per quickstart.md §Auth Service Implementation
+- [x] T026 Create AuthScheduler in src/core/auth/auth.scheduler.ts with daily cron job to cleanup expired refresh tokens per quickstart.md §Cleanup Job
+- [x] T027 Create AuthController in src/core/auth/auth.controller.ts with POST /auth/register, POST /auth/login, POST /auth/refresh, POST /auth/logout, GET /auth/me endpoints per contracts/auth-api.yaml
+- [x] T028 Create AuthModule in src/core/auth/auth.module.ts importing PassportModule, JwtModule, DatabaseModule and registering all auth components
+- [x] T029 [P] Create global exception filter in src/core/common/filters/http-exception.filter.ts per plan.md
+- [x] T030 [P] Create validation pipe in src/core/common/pipes/validation.pipe.ts per plan.md
+- [x] T031 Update AppModule in src/app.module.ts to import DatabaseModule, AuthModule and register global filters/pipes
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -72,19 +72,19 @@
 
 ### Implementation for User Story 1
 
-- [ ] T032 [P] [US1] Create CreateOrganizationDto in src/modules/organizations/dto/create-organization.dto.ts with name field validation per contracts/organizations-api.yaml
-- [ ] T033 [P] [US1] Create UpdateOrganizationDto in src/modules/organizations/dto/update-organization.dto.ts per contracts/organizations-api.yaml
-- [ ] T034 [P] [US1] Create InviteMemberDto in src/modules/organizations/dto/invite-member.dto.ts with email and role fields per contracts/organizations-api.yaml
-- [ ] T035 [P] [US1] Create UpdateMemberRoleDto in src/modules/organizations/dto/update-member-role.dto.ts per contracts/organizations-api.yaml
-- [ ] T036 [US1] Create OrganizationsRepository in src/modules/organizations/repositories/organizations.repository.ts with organization-scoped queries per quickstart.md §Multi-Tenant Query Pattern
-- [ ] T037 [US1] Create OrganizationsService in src/modules/organizations/organizations.service.ts implementing create(), findAll(), findOne(), update(), delete() with RBAC checks per research.md §RBAC
-- [ ] T038 [US1] Implement Member invitation logic in OrganizationsService.inviteMember() enforcing OWNER constraint per data-model.md §Member Invariants
-- [ ] T039 [US1] Implement Member role update in OrganizationsService.updateMemberRole() with ownership transfer validation per data-model.md §Member State Transitions
-- [ ] T040 [US1] Implement Member removal in OrganizationsService.removeMember() preventing OWNER removal per data-model.md §Member Invariants
-- [ ] T041 [US1] Create OrganizationsController in src/modules/organizations/organizations.controller.ts with endpoints: POST /organizations, GET /organizations, GET /organizations/:id, PATCH /organizations/:id, DELETE /organizations/:id per contracts/organizations-api.yaml
-- [ ] T042 [US1] Add member management endpoints to OrganizationsController: POST /organizations/:id/members, GET /organizations/:id/members, PATCH /organizations/:id/members/:memberId, DELETE /organizations/:id/members/:memberId per contracts/organizations-api.yaml
-- [ ] T043 [US1] Create OrganizationsModule in src/modules/organizations/organizations.module.ts importing DatabaseModule and exporting OrganizationsService
-- [ ] T044 [US1] Update AppModule to import OrganizationsModule
+- [x] T032 [P] [US1] Create CreateOrganizationDto in src/modules/organizations/dto/create-organization.dto.ts with name field validation per contracts/organizations-api.yaml
+- [x] T033 [P] [US1] Create UpdateOrganizationDto in src/modules/organizations/dto/update-organization.dto.ts per contracts/organizations-api.yaml
+- [x] T034 [P] [US1] Create InviteMemberDto in src/modules/organizations/dto/invite-member.dto.ts with email and role fields per contracts/organizations-api.yaml
+- [x] T035 [P] [US1] Create UpdateMemberRoleDto in src/modules/organizations/dto/update-member-role.dto.ts per contracts/organizations-api.yaml
+- [x] T036 [US1] Create OrganizationsRepository in src/modules/organizations/repositories/organizations.repository.ts with organization-scoped queries per quickstart.md §Multi-Tenant Query Pattern
+- [x] T037 [US1] Create OrganizationsService in src/modules/organizations/organizations.service.ts implementing create(), findAll(), findOne(), update(), delete() with RBAC checks per research.md §RBAC
+- [x] T038 [US1] Implement Member invitation logic in OrganizationsService.inviteMember() enforcing OWNER constraint per data-model.md §Member Invariants
+- [x] T039 [US1] Implement Member role update in OrganizationsService.updateMemberRole() with ownership transfer validation per data-model.md §Member State Transitions
+- [x] T040 [US1] Implement Member removal in OrganizationsService.removeMember() preventing OWNER removal per data-model.md §Member Invariants
+- [x] T041 [US1] Create OrganizationsController in src/modules/organizations/organizations.controller.ts with endpoints: POST /organizations, GET /organizations, GET /organizations/:id, PATCH /organizations/:id, DELETE /organizations/:id per contracts/organizations-api.yaml
+- [x] T042 [US1] Add member management endpoints to OrganizationsController: POST /organizations/:id/members, GET /organizations/:id/members, PATCH /organizations/:id/members/:memberId, DELETE /organizations/:id/members/:memberId per contracts/organizations-api.yaml
+- [x] T043 [US1] Create OrganizationsModule in src/modules/organizations/organizations.module.ts importing DatabaseModule and exporting OrganizationsService
+- [x] T044 [US1] Update AppModule to import OrganizationsModule
 
 **Checkpoint**: User Story 1 complete - Users can create organizations and manage members independently
 
