@@ -155,21 +155,21 @@
 
 ### Implementation for User Story 4
 
-- [ ] T076 [P] [US4] Create CreateDocumentDto in src/modules/documents/dto/create-document.dto.ts with title and content (Tiptap JSON) fields per contracts/documents-api.yaml
-- [ ] T077 [P] [US4] Create UpdateDocumentDto in src/modules/documents/dto/update-document.dto.ts per contracts/documents-api.yaml
-- [ ] T078 [US4] Create DocumentsRepository in src/modules/documents/repositories/documents.repository.ts with organization-scoped queries per quickstart.md
-- [ ] T079 [US4] Create DocumentsService in src/modules/documents/documents.service.ts implementing create(), findAll(), findOne(), update(), delete() per quickstart.md
-- [ ] T080 [US4] Implement document locking in DocumentsService.lockDocument() creating DocumentLock with 15-minute expiration per research.md §Document Locking
-- [ ] T081 [US4] Implement lock validation in DocumentsService.update() ensuring user holds valid lock per data-model.md §DocumentLock
-- [ ] T082 [US4] Implement document unlock in DocumentsService.unlockDocument() deleting DocumentLock per contracts/documents-api.yaml
-- [ ] T083 [US4] Implement lock extension in DocumentsService.extendLock() updating expiresAt per contracts/documents-api.yaml
-- [ ] T084 [US4] Create DocumentLockScheduler in src/modules/documents/document-lock.scheduler.ts with cron job to delete expired locks per data-model.md §DocumentLock Cleanup
-- [ ] T085 [US4] Validate Tiptap JSON structure in DocumentsService before saving per data-model.md §Document Validation Rules
-- [ ] T086 [US4] Enforce 10MB content size limit in DocumentsService per data-model.md §Document Validation Rules
-- [ ] T087 [US4] Create DocumentsController in src/modules/documents/documents.controller.ts with endpoints: POST /projects/:projectId/documents, GET /projects/:projectId/documents, GET /documents/:id, PATCH /documents/:id, DELETE /documents/:id per contracts/documents-api.yaml
-- [ ] T088 [US4] Add document locking endpoints: POST /documents/:id/lock, DELETE /documents/:id/lock, POST /documents/:id/lock/extend per contracts/documents-api.yaml
-- [ ] T089 [US4] Create DocumentsModule in src/modules/documents/documents.module.ts importing DatabaseModule and exporting DocumentsService
-- [ ] T090 [US4] Update AppModule to import DocumentsModule
+- [x] T076 [P] [US4] Create CreateDocumentDto in src/modules/documents/dto/create-document.dto.ts with title and content (Tiptap JSON) fields per contracts/documents-api.yaml
+- [x] T077 [P] [US4] Create UpdateDocumentDto in src/modules/documents/dto/update-document.dto.ts per contracts/documents-api.yaml
+- [x] T078 [US4] Create DocumentsRepository in src/modules/documents/repositories/documents.repository.ts with organization-scoped queries per quickstart.md
+- [x] T079 [US4] Create DocumentsService in src/modules/documents/documents.service.ts implementing create(), findAll(), findOne(), update(), delete() per quickstart.md
+- [x] T080 [US4] Implement document locking in DocumentsService.lockDocument() creating DocumentLock with 15-minute expiration per research.md §Document Locking
+- [x] T081 [US4] Implement lock validation in DocumentsService.update() ensuring user holds valid lock per data-model.md §DocumentLock
+- [x] T082 [US4] Implement document unlock in DocumentsService.unlockDocument() deleting DocumentLock per contracts/documents-api.yaml
+- [x] T083 [US4] Implement lock extension in DocumentsService.extendLock() updating expiresAt per contracts/documents-api.yaml
+- [x] T084 [US4] Create DocumentLockScheduler in src/modules/documents/document-lock.scheduler.ts with cron job to delete expired locks per data-model.md §DocumentLock Cleanup
+- [x] T085 [US4] Validate Tiptap JSON structure in DocumentsService before saving per data-model.md §Document Validation Rules
+- [x] T086 [US4] Enforce 10MB content size limit in DocumentsService per data-model.md §Document Validation Rules
+- [x] T087 [US4] Create DocumentsController in src/modules/documents/documents.controller.ts with endpoints: POST /projects/:projectId/documents, GET /projects/:projectId/documents, GET /documents/:id, PATCH /documents/:id, DELETE /documents/:id per contracts/documents-api.yaml
+- [x] T088 [US4] Add document locking endpoints: POST /documents/:id/lock, DELETE /documents/:id/lock, POST /documents/:id/lock/extend per contracts/documents-api.yaml
+- [x] T089 [US4] Create DocumentsModule in src/modules/documents/documents.module.ts importing DatabaseModule and exporting DocumentsService
+- [x] T090 [US4] Update AppModule to import DocumentsModule
 
 **Checkpoint**: User Story 4 complete - Documents can be created and edited with conflict prevention via locking
 
