@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: Gerensee API - Documents
+  description: Document management and locking endpoints
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development server
+
+tags:
+  - name: Documents
+    description: Document management
+  - name: Document Locking
+    description: Document lock operations
+
+paths:
+  /projects/{projectId}/documents:
+    post:
+      tags:
+        - Documents
+      summary: Create document
+      description: Create a new document in project
+      operationId: createDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                  example: Meeting Notes
+                content:
+                  type: object
+                  description: Tiptap/ProseMirror JSON structure (empty doc if not provided)
+                  example:
+                    type: doc
+                    content:
+                      - type: paragraph
+                        content:
+                          - type: text
+                            text: "Initial content"
+      responses:
+        '201':
+          description: Document created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Validation error or invalid JSON structure
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    
+    get:
+      tags:
+        - Documents
+      summary: List project documents
+      description: Get all documents in project
+      operationId: listDocuments
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Documents retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DocumentSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /documents/{documentId}:
+    get:
+      tags:
+        - Documents
+      summary: Get document
+      description: Get document with full content and lock status
+      operationId: getDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: Document retrieved
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Document'
+                  - type: object
+                    properties:
+                      lock:
+                        $ref: '#/components/schemas/DocumentLock'
+                        nullable: true
+                        description: Current active lock (if any)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    
+    patch:
+      tags:
+        - Documents
+      summary: Update document
+      description: Update document title or content (requires active lock by current user)
+      operationId: updateDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 200
+                content:
+                  type: object
+                  description: Tiptap/ProseMirror JSON structure
+      responses:
+        '200':
+          description: Document updated (triggers WebSocket event)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Validation error or content too large (>10MB)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Document not locked by current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Document is locked by another user"
+                  lockedBy:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+    
+    delete:
+      tags:
+        - Documents
+      summary: Delete document
+      description: Delete document permanently (creates deletion log entry)
+      operationId: deleteDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '204':
+          description: Document deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /documents/{documentId}/lock:
+    post:
+      tags:
+        - Document Locking
+      summary: Lock document for editing
+      description: Acquire exclusive edit lock (15 minute timeout)
+      operationId: lockDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '201':
+          description: Lock acquired (triggers WebSocket event)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentLock'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Document already locked by another user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Document is locked by Jane Doe until 2026-01-31T15:45:00Z"
+                  lock:
+                    $ref: '#/components/schemas/DocumentLock'
+    
+    delete:
+      tags:
+        - Document Locking
+      summary: Unlock document
+      description: Release lock manually (auto-unlocks after 15 min timeout)
+      operationId: unlockDocument
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '204':
+          description: Lock released (triggers WebSocket event)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not the lock holder
+        '404':
+          description: No active lock or document not found
+    
+    patch:
+      tags:
+        - Document Locking
+      summary: Extend lock timeout
+      description: Reset lock expiration to 15 minutes from now
+      operationId: extendLock
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DocumentId'
+      responses:
+        '200':
+          description: Lock extended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentLock'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not the lock holder
+        '404':
+          description: No active lock
+
+components:
+  schemas:
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          example: clx1234567890abcdef
+        title:
+          type: string
+          example: Meeting Notes
+        content:
+          type: object
+          description: Tiptap/ProseMirror JSON structure
+          example:
+            type: doc
+            content:
+              - type: heading
+                attrs:
+                  level: 1
+                content:
+                  - type: text
+                    text: "Project Kickoff"
+              - type: paragraph
+                content:
+                  - type: text
+                    text: "Discussion points..."
+        projectId:
+          type: string
+        organizationId:
+          type: string
+        createdById:
+          type: string
+        createdBy:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    DocumentSummary:
+      type: object
+      description: Document without full content (for list views)
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        projectId:
+          type: string
+        createdById:
+          type: string
+        createdBy:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+        isLocked:
+          type: boolean
+          description: Whether document has active lock
+        lockedBy:
+          type: object
+          nullable: true
+          properties:
+            name:
+              type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    
+    DocumentLock:
+      type: object
+      properties:
+        id:
+          type: string
+        documentId:
+          type: string
+        userId:
+          type: string
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            email:
+              type: string
+        lockedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: Lock expires 15 minutes after lockedAt
+
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+    
+    DocumentId:
+      name: documentId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    Unauthorized:
+      description: Unauthorized
+    
+    Forbidden:
+      description: Forbidden - insufficient permissions or not project member
+    
+    NotFound:
+      description: Resource not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
