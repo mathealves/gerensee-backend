@@ -98,19 +98,19 @@
 
 ### Implementation for User Story 2
 
-- [ ] T045 [P] [US2] Create CreateProjectDto in src/modules/projects/dto/create-project.dto.ts with name and description fields per contracts/projects-api.yaml
-- [ ] T046 [P] [US2] Create UpdateProjectDto in src/modules/projects/dto/update-project.dto.ts per contracts/projects-api.yaml
-- [ ] T047 [P] [US2] Create AddProjectMemberDto in src/modules/projects/dto/add-project-member.dto.ts with userId field per contracts/projects-api.yaml
-- [ ] T048 [US2] Create ProjectsRepository in src/modules/projects/repositories/projects.repository.ts with organization-scoped queries per quickstart.md §Multi-Tenant Query Pattern
-- [ ] T049 [US2] Create ProjectsService in src/modules/projects/projects.service.ts implementing create(), findAll(), findOne(), update(), delete() per research.md §RBAC
-- [ ] T050 [US2] Implement default TaskStatus creation (To Do, In Progress, Done) in ProjectsService.create() per data-model.md §Project Default Behavior
-- [ ] T051 [US2] Implement ProjectMember management in ProjectsService.addMember(), removeMember() validating user is in organization per data-model.md §ProjectMember Invariants
-- [ ] T052 [US2] Implement RBAC checks in ProjectsService: OWNER/ADMIN can create projects, MEMBER can only view assigned projects per research.md §RBAC
-- [ ] T053 [US2] Create ProjectsController in src/modules/projects/projects.controller.ts with endpoints: POST /organizations/:organizationId/projects, GET /organizations/:organizationId/projects, GET /projects/:id, PATCH /projects/:id, DELETE /projects/:id per contracts/projects-api.yaml
-- [ ] T054 [US2] Add project member endpoints to ProjectsController: POST /projects/:id/members, GET /projects/:id/members, DELETE /projects/:id/members/:memberId per contracts/projects-api.yaml
-- [ ] T055 [US2] Add TaskStatus management endpoints to ProjectsController: POST /projects/:id/statuses, GET /projects/:id/statuses, PATCH /projects/:id/statuses/:statusId, DELETE /projects/:id/statuses/:statusId per contracts/projects-api.yaml
-- [ ] T056 [US2] Create ProjectsModule in src/modules/projects/projects.module.ts importing DatabaseModule and exporting ProjectsService
-- [ ] T057 [US2] Update AppModule to import ProjectsModule
+- [x] T045 [P] [US2] Create CreateProjectDto in src/modules/projects/dto/create-project.dto.ts with name and description fields per contracts/projects-api.yaml
+- [x] T046 [P] [US2] Create UpdateProjectDto in src/modules/projects/dto/update-project.dto.ts per contracts/projects-api.yaml
+- [x] T047 [P] [US2] Create AddProjectMemberDto in src/modules/projects/dto/add-project-member.dto.ts with userId field per contracts/projects-api.yaml
+- [x] T048 [US2] Create ProjectsRepository in src/modules/projects/repositories/projects.repository.ts with organization-scoped queries per quickstart.md §Multi-Tenant Query Pattern
+- [x] T049 [US2] Create ProjectsService in src/modules/projects/projects.service.ts implementing create(), findAll(), findOne(), update(), delete() per research.md §RBAC
+- [x] T050 [US2] Implement default TaskStatus creation (To Do, In Progress, Done) in ProjectsService.create() per data-model.md §Project Default Behavior
+- [x] T051 [US2] Implement ProjectMember management in ProjectsService.addMember(), removeMember() validating user is in organization per data-model.md §ProjectMember Invariants
+- [x] T052 [US2] Implement RBAC checks in ProjectsService: OWNER/ADMIN can create projects, MEMBER can only view assigned projects per research.md §RBAC
+- [x] T053 [US2] Create ProjectsController in src/modules/projects/projects.controller.ts with endpoints: POST /organizations/:organizationId/projects, GET /organizations/:organizationId/projects, GET /projects/:id, PATCH /projects/:id, DELETE /projects/:id per contracts/projects-api.yaml
+- [x] T054 [US2] Add project member endpoints to ProjectsController: POST /projects/:id/members, GET /projects/:id/members, DELETE /projects/:id/members/:memberId per contracts/projects-api.yaml
+- [x] T055 [US2] Add TaskStatus management endpoints to ProjectsController: POST /projects/:id/statuses, GET /projects/:id/statuses, PATCH /projects/:id/statuses/:statusId, DELETE /projects/:id/statuses/:statusId per contracts/projects-api.yaml
+- [x] T056 [US2] Create ProjectsModule in src/modules/projects/projects.module.ts importing DatabaseModule and exporting ProjectsService
+- [x] T057 [US2] Update AppModule to import ProjectsModule
 
 **Checkpoint**: User Story 2 complete - Projects can be created and members assigned independently
 

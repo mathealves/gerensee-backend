@@ -80,6 +80,18 @@ Rationale: Separates transport-layer validation from domain logic, ensures consi
 
 ---
 
+### Commit Granularity
+Commits are organized by **feature boundary**, not by implementation layer.
+
+- A commit represents a complete, functional slice of work (e.g., all DTOs + repository + service + controller + module wiring for a single feature)
+- Do NOT split a feature across multiple commits by layer (e.g., "DTOs commit" then "Service commit")
+- A commit is ready when the feature is fully implemented end-to-end and passes its independent test from spec.md
+- Cross-cutting infrastructure (filters, pipes, guards) may be committed independently when they have no feature-specific dependencies
+
+Rationale: Keeps git history meaningful and ensures each commit represents a shippable, testable unit of functionality.
+
+---
+
 ## Development and Change Process
 
 - Every meaningful change to domain rules or invariants must be accompanied by a written specification.
