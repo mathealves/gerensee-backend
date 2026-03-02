@@ -1,14 +1,23 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
   const port = config.get<number>('NEST_PORT', 3000);
   app.setGlobalPrefix('api/v1');
-  app.useGlobalPipes(new ValidationPipe());
+
+  // Swagger / OpenAPI
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Gerensee API')
+    .setDescription('Multi-tenant project management platform API')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(port);
 }

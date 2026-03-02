@@ -12,10 +12,13 @@ import {
 } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto, UpdateDocumentDto } from './dto';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../core/auth/decorators/current-user.decorator';
 import type { CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
 
+@ApiTags('Documents')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class DocumentsController {

@@ -179,17 +179,17 @@
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T091 [P] Add API documentation using Swagger/OpenAPI decorators in all controllers per plan.md
-- [ ] T092 [P] Add request logging interceptor in src/core/common/interceptors/logging.interceptor.ts per plan.md
-- [ ] T093 [P] Add rate limiting for /auth/refresh endpoint (10 req/min per user) per research.md §JWT Token Strategy
-- [ ] T094 [P] Add composite indexes for optimized board queries if not already in schema per data-model.md §Composite Indexes
-- [ ] T095 Create seed script in prisma/seed.ts creating demo organization with owner user per data-model.md §Migration Strategy
-- [ ] T096 [P] Update README.md with quickstart instructions per quickstart.md
-- [ ] T097 [P] Create .env.example file if not done in Setup phase
-- [ ] T098 Validate all edge cases from spec.md: access denial for non-project members, assignee validation, locked document editing per spec.md §Edge Cases
-- [ ] T099 Performance testing: verify <500ms p95 for API endpoints per plan.md §Performance Goals
-- [ ] T100 Performance testing: verify board updates reflected within 2s per spec.md §SC-002
-- [ ] T101 Run full quickstart.md validation: follow all steps to ensure documentation accuracy
+- [x] T091 [P] Add API documentation using Swagger/OpenAPI decorators in all controllers per plan.md
+- [x] T092 [P] Add request logging interceptor in src/core/common/interceptors/logging.interceptor.ts per plan.md
+- [x] T093 [P] Add rate limiting for /auth/refresh endpoint (10 req/min per user) per research.md §JWT Token Strategy
+- [x] T094 [P] Add composite indexes for optimized board queries if not already in schema per data-model.md §Composite Indexes
+- [x] T095 Create seed script in prisma/seed.ts creating demo organization with owner user per data-model.md §Migration Strategy
+- [x] T096 [P] Update README.md with quickstart instructions per quickstart.md
+- [x] T097 [P] Create .env.example file if not done in Setup phase
+- [x] T098 Validate all edge cases from spec.md: access denial for non-project members, assignee validation, locked document editing per spec.md §Edge Cases
+- [x] T099 Performance testing: verify <500ms p95 for API endpoints per plan.md §Performance Goals
+- [x] T100 Performance testing: verify board updates reflected within 2s per spec.md §SC-002
+- [x] T101 Run full quickstart.md validation: follow all steps to ensure documentation accuracy
 
 ---
 

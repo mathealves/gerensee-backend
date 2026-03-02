@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { DatabaseModule } from './core/database/database.module';
 import { AuthModule } from './core/auth/auth.module';
 import { HttpExceptionFilter } from './core/common/filters/http-exception.filter';
+import { LoggingInterceptor } from './core/common/interceptors/logging.interceptor';
 import { ValidationPipe } from './core/common/pipes/validation.pipe';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { ProjectsModule } from './modules/projects/projects.module';
@@ -34,6 +36,7 @@ import * as Joi from 'joi';
       }),
     }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
     DatabaseModule,
     AuthModule,
     OrganizationsModule,
@@ -46,6 +49,10 @@ import * as Joi from 'joi';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
     {
       provide: APP_PIPE,

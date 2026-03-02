@@ -18,9 +18,12 @@ import {
 } from './dto';
 import { OrganizationsService } from './organizations.service';
 import { Organization, Member } from '../../generated/prisma/client';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser, type CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
 
+@ApiTags('Organizations')
+@ApiBearerAuth()
 @Controller('organizations')
 @UseGuards(JwtAuthGuard)
 export class OrganizationsController {

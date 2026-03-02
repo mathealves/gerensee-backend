@@ -13,11 +13,14 @@ import {
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto, AssignTaskDto } from './dto';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../core/auth/decorators/current-user.decorator';
 import type { CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
 import { TaskPriority } from '../../generated/prisma/client';
 
+@ApiTags('Tasks')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller()
 export class TasksController {
