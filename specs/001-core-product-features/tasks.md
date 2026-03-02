@@ -124,24 +124,24 @@
 
 ### Implementation for User Story 3
 
-- [ ] T058 [P] [US3] Create CreateTaskDto in src/modules/tasks/dto/create-task.dto.ts with title, description, statusId, priority, dueDate, assigneeIds fields per contracts/tasks-api.yaml
-- [ ] T059 [P] [US3] Create UpdateTaskDto in src/modules/tasks/dto/update-task.dto.ts per contracts/tasks-api.yaml
-- [ ] T060 [P] [US3] Create MoveTaskDto in src/modules/tasks/dto/move-task.dto.ts with statusId field per contracts/tasks-api.yaml
-- [ ] T061 [P] [US3] Create AssignTaskDto in src/modules/tasks/dto/assign-task.dto.ts with userIds array per contracts/tasks-api.yaml
-- [ ] T062 [US3] Create TasksRepository in src/modules/tasks/repositories/tasks.repository.ts with optimized board query (single query with includes) per data-model.md §Query Patterns
-- [ ] T063 [US3] Create TasksService in src/modules/tasks/tasks.service.ts implementing create(), findAll(), findOne(), update(), delete() with organization scoping per quickstart.md
-- [ ] T064 [US3] Implement task assignment validation in TasksService.assignTask() ensuring assignees are project members per data-model.md §TaskAssignment Invariants
-- [ ] T065 [US3] Implement task move validation in TasksService.moveTask() ensuring statusId belongs to same project per data-model.md §Task Invariants
-- [ ] T066 [US3] Create BoardGateway in src/modules/tasks/board.gateway.ts implementing WebSocket server per quickstart.md §WebSocket Gateway
-- [ ] T067 [US3] Implement joinBoard and leaveBoard message handlers in BoardGateway validating user is project member per contracts/websocket-api.md
-- [ ] T068 [US3] Implement WebSocket authentication in BoardGateway.handleConnection() validating JWT token per contracts/websocket-api.md §Authentication
-- [ ] T069 [US3] Integrate BoardGateway.notifyTaskUpdate() in TasksService to emit taskCreated, taskUpdated, taskMoved events after mutations per contracts/websocket-api.md
-- [ ] T070 [US3] Ensure emit timing <100ms after mutation per contracts/websocket-api.md §Performance
-- [ ] T071 [US3] Create TasksController in src/modules/tasks/tasks.controller.ts with endpoints: POST /projects/:projectId/tasks, GET /projects/:projectId/tasks, GET /tasks/:id, PATCH /tasks/:id, DELETE /tasks/:id per contracts/tasks-api.yaml
-- [ ] T072 [US3] Add task board endpoint to TasksController: GET /projects/:projectId/board returning optimized board view per contracts/tasks-api.yaml
-- [ ] T073 [US3] Add task assignment endpoints: POST /tasks/:id/assign, DELETE /tasks/:id/assign/:userId per contracts/tasks-api.yaml
-- [ ] T074 [US3] Create TasksModule in src/modules/tasks/tasks.module.ts importing DatabaseModule, registering BoardGateway and exporting TasksService
-- [ ] T075 [US3] Update AppModule to import TasksModule
+- [x] T058 [P] [US3] Create CreateTaskDto in src/modules/tasks/dto/create-task.dto.ts with title, description, statusId, priority, dueDate, assigneeIds fields per contracts/tasks-api.yaml
+- [x] T059 [P] [US3] Create UpdateTaskDto in src/modules/tasks/dto/update-task.dto.ts per contracts/tasks-api.yaml
+- [x] T060 [P] [US3] Create MoveTaskDto in src/modules/tasks/dto/move-task.dto.ts with statusId field per contracts/tasks-api.yaml
+- [x] T061 [P] [US3] Create AssignTaskDto in src/modules/tasks/dto/assign-task.dto.ts with userIds array per contracts/tasks-api.yaml
+- [x] T062 [US3] Create TasksRepository in src/modules/tasks/repositories/tasks.repository.ts with optimized board query (single query with includes) per data-model.md §Query Patterns
+- [x] T063 [US3] Create TasksService in src/modules/tasks/tasks.service.ts implementing create(), findAll(), findOne(), update(), delete() with organization scoping per quickstart.md
+- [x] T064 [US3] Implement task assignment validation in TasksService.assignTask() ensuring assignees are project members per data-model.md §TaskAssignment Invariants
+- [x] T065 [US3] Implement task move validation in TasksService.moveTask() ensuring statusId belongs to same project per data-model.md §Task Invariants
+- [x] T066 [US3] Create BoardGateway in src/modules/tasks/board.gateway.ts implementing WebSocket server per quickstart.md §WebSocket Gateway
+- [x] T067 [US3] Implement joinBoard and leaveBoard message handlers in BoardGateway validating user is project member per contracts/websocket-api.md
+- [x] T068 [US3] Implement WebSocket authentication in BoardGateway.handleConnection() validating JWT token per contracts/websocket-api.md §Authentication
+- [x] T069 [US3] Integrate BoardGateway.notifyTaskUpdate() in TasksService to emit taskCreated, taskUpdated, taskMoved events after mutations per contracts/websocket-api.md
+- [x] T070 [US3] Ensure emit timing <100ms after mutation per contracts/websocket-api.md §Performance
+- [x] T071 [US3] Create TasksController in src/modules/tasks/tasks.controller.ts with endpoints: POST /projects/:projectId/tasks, GET /projects/:projectId/tasks, GET /tasks/:id, PATCH /tasks/:id, DELETE /tasks/:id per contracts/tasks-api.yaml
+- [x] T072 [US3] Add task board endpoint to TasksController: GET /projects/:projectId/board returning optimized board view per contracts/tasks-api.yaml
+- [x] T073 [US3] Add task assignment endpoints: POST /tasks/:id/assign, DELETE /tasks/:id/assign/:userId per contracts/tasks-api.yaml
+- [x] T074 [US3] Create TasksModule in src/modules/tasks/tasks.module.ts importing DatabaseModule, registering BoardGateway and exporting TasksService
+- [x] T075 [US3] Update AppModule to import TasksModule
 
 **Checkpoint**: User Story 3 complete - Tasks can be created, managed on Kanban board with real-time updates
 

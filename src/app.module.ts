@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from './core/common/filters/http-exception.filter
 import { ValidationPipe } from './core/common/pipes/validation.pipe';
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -34,6 +35,7 @@ import * as Joi from 'joi';
     AuthModule,
     OrganizationsModule,
     ProjectsModule,
+    TasksModule,
   ],
   controllers: [],
   providers: [
