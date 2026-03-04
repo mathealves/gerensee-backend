@@ -8,6 +8,10 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const port = config.get<number>('NEST_PORT', 3000);
   app.setGlobalPrefix('api/v1');
+  app.enableCors({
+    origin: config.get<string>('FRONTEND_URL', 'http://localhost:3001'),
+    credentials: true,
+  });
 
   // Swagger / OpenAPI
   const swaggerConfig = new DocumentBuilder()
