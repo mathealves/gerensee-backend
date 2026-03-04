@@ -5,9 +5,10 @@ import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { TasksRepository } from './repositories/tasks.repository';
 import { BoardGateway } from './board.gateway';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
-  imports: [DatabaseModule, AuthModule],
+  imports: [DatabaseModule, AuthModule, JwtModule],
   controllers: [TasksController],
   providers: [TasksService, TasksRepository, BoardGateway],
   exports: [TasksService],
