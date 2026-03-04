@@ -31,7 +31,7 @@ This repository contains the backend application, built with **NestJS** and **Pr
 ### 2. Clone & install dependencies
 
 ```bash
-git clone <repo-url> && cd gerensee-backend
+git clone git@github.com:mathealves/gerensee-backend.git && cd gerensee-backend
 pnpm install
 ```
 
