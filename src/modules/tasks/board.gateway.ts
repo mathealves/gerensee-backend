@@ -39,7 +39,9 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       const payload = this.jwtService.verify<JwtPayload>(token);
 
-      const user = await this.prisma.user.findUnique({ where: { id: payload.sub } });
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
       if (!user) {
         this.disconnect(client, 'AUTH_FAILED', 'User not found');
         return;
@@ -72,7 +74,10 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): Promise<void> {
     const user: CurrentUserType = client.data.user;
     if (!user) {
-      client.emit('error', { message: 'Not authenticated', code: 'AUTH_FAILED' });
+      client.emit('error', {
+        message: 'Not authenticated',
+        code: 'AUTH_FAILED',
+      });
       return;
     }
 
@@ -93,18 +98,26 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
         where: { userId: user.id, organizationId: user.organizationId },
       });
       const pm = member
-        ? await this.prisma.projectMember.findFirst({ where: { projectId, memberId: member.id } })
+        ? await this.prisma.projectMember.findFirst({
+            where: { projectId, memberId: member.id },
+          })
         : null;
 
       if (!pm) {
-        client.emit('error', { message: 'Not a member of this project', code: 'FORBIDDEN' });
+        client.emit('error', {
+          message: 'Not a member of this project',
+          code: 'FORBIDDEN',
+        });
         return;
       }
     }
 
     const room = `board:${projectId}`;
     await client.join(room);
-    client.emit('boardJoined', { projectId, message: 'Joined board successfully' });
+    client.emit('boardJoined', {
+      projectId,
+      message: 'Joined board successfully',
+    });
     this.logger.log(`User ${user.id} joined room ${room}`);
   }
 
@@ -121,10 +134,16 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // --- Server → Client Notifications ---
 
   notifyTaskCreated(projectId: string, task: Task): void {
-    this.server.to(`board:${projectId}`).emit('taskCreated', { projectId, task });
+    this.server
+      .to(`board:${projectId}`)
+      .emit('taskCreated', { projectId, task });
   }
 
-  notifyTaskUpdated(projectId: string, task: Task, updatedBy: CurrentUserType): void {
+  notifyTaskUpdated(
+    projectId: string,
+    task: Task,
+    updatedBy: CurrentUserType,
+  ): void {
     this.server.to(`board:${projectId}`).emit('taskUpdated', {
       projectId,
       task: {
@@ -135,7 +154,9 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   notifyTaskDeleted(projectId: string, taskId: string): void {
-    this.server.to(`board:${projectId}`).emit('taskDeleted', { projectId, taskId });
+    this.server
+      .to(`board:${projectId}`)
+      .emit('taskDeleted', { projectId, taskId });
   }
 
   // --- Helpers ---

@@ -29,7 +29,11 @@ export class TasksService {
     private readonly boardGateway: BoardGateway,
   ) {}
 
-  async create(user: CurrentUserType, projectId: string, dto: CreateTaskDto): Promise<Task> {
+  async create(
+    user: CurrentUserType,
+    projectId: string,
+    dto: CreateTaskDto,
+  ): Promise<Task> {
     await this.requireProjectAccess(user, projectId);
 
     // Validate statusId belongs to this project
@@ -43,7 +47,13 @@ export class TasksService {
     // Resolve assigneeIds (user IDs) → projectMember IDs
     const projectMemberIds: string[] = [];
     if (dto.assigneeIds?.length) {
-      projectMemberIds.push(...(await this.resolveAssigneeIds(dto.assigneeIds, projectId, user.organizationId)));
+      projectMemberIds.push(
+        ...(await this.resolveAssigneeIds(
+          dto.assigneeIds,
+          projectId,
+          user.organizationId,
+        )),
+      );
     }
 
     const task = await this.prisma.$transaction(async (tx) => {
@@ -82,7 +92,11 @@ export class TasksService {
     return task;
   }
 
-  async findAll(user: CurrentUserType, projectId: string, filters: TaskQueryFilters): Promise<Task[]> {
+  async findAll(
+    user: CurrentUserType,
+    projectId: string,
+    filters: TaskQueryFilters,
+  ): Promise<Task[]> {
     await this.requireProjectAccess(user, projectId);
 
     const repoFilters: TaskFilters = {
@@ -101,22 +115,34 @@ export class TasksService {
   async getBoard(user: CurrentUserType, projectId: string) {
     await this.requireProjectAccess(user, projectId);
 
-    const project = await this.prisma.project.findUnique({ where: { id: projectId } });
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+    });
     const columns = await this.repository.findBoardData(projectId);
 
     return { project, columns };
   }
 
   async findOne(user: CurrentUserType, taskId: string): Promise<Task> {
-    const task = await this.repository.findOneInOrg(taskId, user.organizationId);
+    const task = await this.repository.findOneInOrg(
+      taskId,
+      user.organizationId,
+    );
     if (!task) throw new NotFoundException('Task not found');
 
     await this.requireProjectAccess(user, task.projectId);
     return task;
   }
 
-  async update(user: CurrentUserType, taskId: string, dto: UpdateTaskDto): Promise<Task> {
-    const task = await this.repository.findOneInOrg(taskId, user.organizationId);
+  async update(
+    user: CurrentUserType,
+    taskId: string,
+    dto: UpdateTaskDto,
+  ): Promise<Task> {
+    const task = await this.repository.findOneInOrg(
+      taskId,
+      user.organizationId,
+    );
     if (!task) throw new NotFoundException('Task not found');
 
     await this.requireProjectAccess(user, task.projectId);
@@ -135,7 +161,12 @@ export class TasksService {
       title: dto.title,
       description: dto.description,
       priority: dto.priority,
-      dueDate: dto.dueDate !== undefined ? (dto.dueDate ? new Date(dto.dueDate) : null) : undefined,
+      dueDate:
+        dto.dueDate !== undefined
+          ? dto.dueDate
+            ? new Date(dto.dueDate)
+            : null
+          : undefined,
       statusId: dto.statusId,
     });
 
@@ -144,7 +175,10 @@ export class TasksService {
   }
 
   async delete(user: CurrentUserType, taskId: string): Promise<void> {
-    const task = await this.repository.findOneInOrg(taskId, user.organizationId);
+    const task = await this.repository.findOneInOrg(
+      taskId,
+      user.organizationId,
+    );
     if (!task) throw new NotFoundException('Task not found');
 
     await this.requireProjectAccess(user, task.projectId);
@@ -154,16 +188,27 @@ export class TasksService {
   }
 
   async assignUser(user: CurrentUserType, taskId: string, dto: AssignTaskDto) {
-    const task = await this.repository.findOneInOrg(taskId, user.organizationId);
+    const task = await this.repository.findOneInOrg(
+      taskId,
+      user.organizationId,
+    );
     if (!task) throw new NotFoundException('Task not found');
 
     await this.requireProjectAccess(user, task.projectId);
 
     // Resolve userId → projectMember
-    const [projectMemberId] = await this.resolveAssigneeIds([dto.userId], task.projectId, user.organizationId);
+    const [projectMemberId] = await this.resolveAssigneeIds(
+      [dto.userId],
+      task.projectId,
+      user.organizationId,
+    );
 
-    const existing = await this.repository.findAssignment(taskId, projectMemberId);
-    if (existing) throw new ConflictException('User is already assigned to this task');
+    const existing = await this.repository.findAssignment(
+      taskId,
+      projectMemberId,
+    );
+    if (existing)
+      throw new ConflictException('User is already assigned to this task');
 
     const assignment = await this.repository.createAssignment({
       task: { connect: { id: taskId } },
@@ -174,8 +219,15 @@ export class TasksService {
     return assignment;
   }
 
-  async unassignUser(user: CurrentUserType, taskId: string, assignmentId: string): Promise<void> {
-    const task = await this.repository.findOneInOrg(taskId, user.organizationId);
+  async unassignUser(
+    user: CurrentUserType,
+    taskId: string,
+    assignmentId: string,
+  ): Promise<void> {
+    const task = await this.repository.findOneInOrg(
+      taskId,
+      user.organizationId,
+    );
     if (!task) throw new NotFoundException('Task not found');
 
     await this.requireProjectAccess(user, task.projectId);
@@ -190,7 +242,10 @@ export class TasksService {
 
   // --- Helpers ---
 
-  private async requireProjectAccess(user: CurrentUserType, projectId: string): Promise<void> {
+  private async requireProjectAccess(
+    user: CurrentUserType,
+    projectId: string,
+  ): Promise<void> {
     const project = await this.prisma.project.findFirst({
       where: { id: projectId, organizationId: user.organizationId },
     });
@@ -200,13 +255,16 @@ export class TasksService {
       const pm = await this.prisma.member.findFirst({
         where: { userId: user.id, organizationId: user.organizationId },
       });
-      if (!pm) throw new ForbiddenException('Organization membership not found');
+      if (!pm)
+        throw new ForbiddenException('Organization membership not found');
 
       const projectMember = await this.prisma.projectMember.findFirst({
         where: { projectId, memberId: pm.id },
       });
       if (!projectMember) {
-        throw new ForbiddenException('Access denied: not a member of this project');
+        throw new ForbiddenException(
+          'Access denied: not a member of this project',
+        );
       }
     }
   }
@@ -215,7 +273,8 @@ export class TasksService {
     const member = await this.prisma.member.findFirst({
       where: { userId: user.id, organizationId: user.organizationId },
     });
-    if (!member) throw new ForbiddenException('Organization membership not found');
+    if (!member)
+      throw new ForbiddenException('Organization membership not found');
 
     const pm = await this.prisma.projectMember.findFirst({
       where: { projectId, memberId: member.id },
@@ -236,14 +295,18 @@ export class TasksService {
         where: { userId, organizationId },
       });
       if (!member) {
-        throw new BadRequestException(`User ${userId} is not in this organization`);
+        throw new BadRequestException(
+          `User ${userId} is not in this organization`,
+        );
       }
 
       const pm = await this.prisma.projectMember.findFirst({
         where: { projectId, memberId: member.id },
       });
       if (!pm) {
-        throw new BadRequestException(`User ${userId} is not a member of this project`);
+        throw new BadRequestException(
+          `User ${userId} is not a member of this project`,
+        );
       }
 
       projectMemberIds.push(pm.id);

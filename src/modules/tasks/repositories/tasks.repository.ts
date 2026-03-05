@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Task, TaskAssignments, TaskPriority } from '../../../generated/prisma/client';
+import {
+  Prisma,
+  Task,
+  TaskAssignments,
+  TaskPriority,
+} from '../../../generated/prisma/client';
 import { PrismaService } from '../../../core/database/prisma.service';
 
 export interface TaskFilters {
@@ -66,15 +71,25 @@ export class TasksRepository {
   }
 
   findOne(taskId: string): Promise<Task | null> {
-    return this.prisma.task.findUnique({ where: { id: taskId }, include: TASK_INCLUDE });
+    return this.prisma.task.findUnique({
+      where: { id: taskId },
+      include: TASK_INCLUDE,
+    });
   }
 
   findOneInOrg(taskId: string, organizationId: string): Promise<Task | null> {
-    return this.prisma.task.findFirst({ where: { id: taskId, organizationId }, include: TASK_INCLUDE });
+    return this.prisma.task.findFirst({
+      where: { id: taskId, organizationId },
+      include: TASK_INCLUDE,
+    });
   }
 
   update(taskId: string, data: Prisma.TaskUncheckedUpdateInput): Promise<Task> {
-    return this.prisma.task.update({ where: { id: taskId }, data, include: TASK_INCLUDE });
+    return this.prisma.task.update({
+      where: { id: taskId },
+      data,
+      include: TASK_INCLUDE,
+    });
   }
 
   delete(taskId: string): Promise<Task> {
@@ -83,15 +98,24 @@ export class TasksRepository {
 
   // --- Assignments ---
 
-  findAssignment(taskId: string, projectMemberId: string): Promise<TaskAssignments | null> {
-    return this.prisma.taskAssignments.findFirst({ where: { taskId, projectMemberId } });
+  findAssignment(
+    taskId: string,
+    projectMemberId: string,
+  ): Promise<TaskAssignments | null> {
+    return this.prisma.taskAssignments.findFirst({
+      where: { taskId, projectMemberId },
+    });
   }
 
   findAssignmentById(assignmentId: string): Promise<TaskAssignments | null> {
-    return this.prisma.taskAssignments.findUnique({ where: { id: assignmentId } });
+    return this.prisma.taskAssignments.findUnique({
+      where: { id: assignmentId },
+    });
   }
 
-  createAssignment(data: Prisma.TaskAssignmentsCreateInput): Promise<TaskAssignments> {
+  createAssignment(
+    data: Prisma.TaskAssignmentsCreateInput,
+  ): Promise<TaskAssignments> {
     return this.prisma.taskAssignments.create({ data });
   }
 

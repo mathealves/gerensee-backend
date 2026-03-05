@@ -7,7 +7,13 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../core/database/prisma.service';
 import { ProjectsRepository } from './repositories/projects.repository';
-import type { CreateProjectDto, UpdateProjectDto, AddProjectMemberDto, CreateTaskStatusDto, UpdateTaskStatusDto } from './dto';
+import type {
+  CreateProjectDto,
+  UpdateProjectDto,
+  AddProjectMemberDto,
+  CreateTaskStatusDto,
+  UpdateTaskStatusDto,
+} from './dto';
 import type { CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
 import { Project, TaskStatus, Role } from '../../generated/prisma/client';
 
@@ -24,13 +30,21 @@ export class ProjectsService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(user: CurrentUserType, dto: CreateProjectDto): Promise<Project & { taskStatuses: TaskStatus[] }> {
+  async create(
+    user: CurrentUserType,
+    dto: CreateProjectDto,
+  ): Promise<Project & { taskStatuses: TaskStatus[] }> {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
 
     // Check for duplicate project name in organization
-    const existing = await this.repository.findByNameInOrganization(dto.name, user.organizationId);
+    const existing = await this.repository.findByNameInOrganization(
+      dto.name,
+      user.organizationId,
+    );
     if (existing) {
-      throw new ConflictException('Project name already exists in this organization');
+      throw new ConflictException(
+        'Project name already exists in this organization',
+      );
     }
 
     // Create project + default task statuses + add creator as project member in transaction
@@ -76,7 +90,10 @@ export class ProjectsService {
     return this.repository.findAllInOrganization(user.organizationId, user.id);
   }
 
-  async findOne(user: CurrentUserType, projectId: string): Promise<Project & { taskStatuses: TaskStatus[] }> {
+  async findOne(
+    user: CurrentUserType,
+    projectId: string,
+  ): Promise<Project & { taskStatuses: TaskStatus[] }> {
     const project = await this.repository.findOne(projectId);
 
     if (!project || project.organizationId !== user.organizationId) {
@@ -90,21 +107,32 @@ export class ProjectsService {
         await this.getMemberId(user),
       );
       if (!membership) {
-        throw new ForbiddenException('Access denied: not a member of this project');
+        throw new ForbiddenException(
+          'Access denied: not a member of this project',
+        );
       }
     }
 
     return project;
   }
 
-  async update(user: CurrentUserType, projectId: string, dto: UpdateProjectDto): Promise<Project> {
+  async update(
+    user: CurrentUserType,
+    projectId: string,
+    dto: UpdateProjectDto,
+  ): Promise<Project> {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
     if (dto.name) {
-      const existing = await this.repository.findByNameInOrganization(dto.name, user.organizationId);
+      const existing = await this.repository.findByNameInOrganization(
+        dto.name,
+        user.organizationId,
+      );
       if (existing && existing.id !== projectId) {
-        throw new ConflictException('Project name already exists in this organization');
+        throw new ConflictException(
+          'Project name already exists in this organization',
+        );
       }
     }
 
@@ -119,7 +147,10 @@ export class ProjectsService {
 
   // --- Task Statuses ---
 
-  async findStatuses(user: CurrentUserType, projectId: string): Promise<TaskStatus[]> {
+  async findStatuses(
+    user: CurrentUserType,
+    projectId: string,
+  ): Promise<TaskStatus[]> {
     await this.requireProjectAccess(user, projectId);
     return this.repository.findTaskStatuses(projectId);
   }
@@ -132,7 +163,12 @@ export class ProjectsService {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
-    return this.repository.createTaskStatus({ name: dto.name, color: dto.color, position: dto.position, project: { connect: { id: projectId } } });
+    return this.repository.createTaskStatus({
+      name: dto.name,
+      color: dto.color,
+      position: dto.position,
+      project: { connect: { id: projectId } },
+    });
   }
 
   async updateStatus(
@@ -148,7 +184,11 @@ export class ProjectsService {
     return this.repository.updateTaskStatus(statusId, dto);
   }
 
-  async deleteStatus(user: CurrentUserType, projectId: string, statusId: string): Promise<void> {
+  async deleteStatus(
+    user: CurrentUserType,
+    projectId: string,
+    statusId: string,
+  ): Promise<void> {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
     await this.requireStatusInProject(statusId, projectId);
@@ -168,7 +208,11 @@ export class ProjectsService {
     return this.repository.findProjectMembers(projectId);
   }
 
-  async addMember(user: CurrentUserType, projectId: string, dto: AddProjectMemberDto) {
+  async addMember(
+    user: CurrentUserType,
+    projectId: string,
+    dto: AddProjectMemberDto,
+  ) {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
@@ -177,11 +221,16 @@ export class ProjectsService {
       where: { userId: dto.userId, organizationId: user.organizationId },
     });
     if (!member) {
-      throw new BadRequestException('User is not a member of this organization');
+      throw new BadRequestException(
+        'User is not a member of this organization',
+      );
     }
 
     // Check if already in project
-    const existing = await this.repository.findProjectMember(projectId, member.id);
+    const existing = await this.repository.findProjectMember(
+      projectId,
+      member.id,
+    );
     if (existing) {
       throw new ConflictException('User is already a member of this project');
     }
@@ -192,7 +241,11 @@ export class ProjectsService {
     });
   }
 
-  async removeMember(user: CurrentUserType, projectId: string, projectMemberId: string): Promise<void> {
+  async removeMember(
+    user: CurrentUserType,
+    projectId: string,
+    projectMemberId: string,
+  ): Promise<void> {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
@@ -210,22 +263,39 @@ export class ProjectsService {
     return role === 'OWNER' || role === 'ADMIN';
   }
 
-  private async requireRole(user: CurrentUserType, roles: Role[]): Promise<void> {
+  private async requireRole(
+    user: CurrentUserType,
+    roles: Role[],
+  ): Promise<void> {
     if (!roles.includes(user.role as Role)) {
-      throw new ForbiddenException(`Access denied: requires one of: ${roles.join(', ')}`);
+      throw new ForbiddenException(
+        `Access denied: requires one of: ${roles.join(', ')}`,
+      );
     }
   }
 
-  private async requireProjectInOrg(projectId: string, organizationId: string): Promise<Project> {
-    const project = await this.repository.findOneInOrganization(projectId, organizationId);
+  private async requireProjectInOrg(
+    projectId: string,
+    organizationId: string,
+  ): Promise<Project> {
+    const project = await this.repository.findOneInOrganization(
+      projectId,
+      organizationId,
+    );
     if (!project) {
       throw new NotFoundException('Project not found');
     }
     return project;
   }
 
-  private async requireProjectAccess(user: CurrentUserType, projectId: string): Promise<void> {
-    const project = await this.repository.findOneInOrganization(projectId, user.organizationId);
+  private async requireProjectAccess(
+    user: CurrentUserType,
+    projectId: string,
+  ): Promise<void> {
+    const project = await this.repository.findOneInOrganization(
+      projectId,
+      user.organizationId,
+    );
     if (!project) {
       throw new NotFoundException('Project not found');
     }
@@ -234,12 +304,17 @@ export class ProjectsService {
       const memberId = await this.getMemberId(user);
       const pm = await this.repository.findProjectMember(projectId, memberId);
       if (!pm) {
-        throw new ForbiddenException('Access denied: not a member of this project');
+        throw new ForbiddenException(
+          'Access denied: not a member of this project',
+        );
       }
     }
   }
 
-  private async requireStatusInProject(statusId: string, projectId: string): Promise<TaskStatus> {
+  private async requireStatusInProject(
+    statusId: string,
+    projectId: string,
+  ): Promise<TaskStatus> {
     const status = await this.repository.findTaskStatus(statusId);
     if (!status || status.projectId !== projectId) {
       throw new NotFoundException('Task status not found');

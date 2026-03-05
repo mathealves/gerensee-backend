@@ -1,17 +1,17 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
+import {
+  Controller,
+  Get,
+  Post,
   Patch,
   Delete,
-  Param, 
-  Body, 
+  Param,
+  Body,
   UseGuards,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { 
-  CreateOrganizationDto, 
+import {
+  CreateOrganizationDto,
   UpdateOrganizationDto,
   InviteMemberDto,
   UpdateMemberRoleDto,
@@ -20,7 +20,10 @@ import { OrganizationsService } from './organizations.service';
 import { Organization, Member } from '../../generated/prisma/client';
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
-import { CurrentUser, type CurrentUserType } from '../../core/auth/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type CurrentUserType,
+} from '../../core/auth/decorators/current-user.decorator';
 
 @ApiTags('Organizations')
 @ApiBearerAuth()
@@ -98,7 +101,12 @@ export class OrganizationsController {
     @Param('memberId') memberId: string,
     @Body() updateMemberRoleDto: UpdateMemberRoleDto,
   ): Promise<Member> {
-    return this.organizationsService.updateMemberRole(user, id, memberId, updateMemberRoleDto);
+    return this.organizationsService.updateMemberRole(
+      user,
+      id,
+      memberId,
+      updateMemberRoleDto,
+    );
   }
 
   @Delete(':id/members/:memberId')
@@ -111,4 +119,3 @@ export class OrganizationsController {
     await this.organizationsService.removeMember(user, id, memberId);
   }
 }
-

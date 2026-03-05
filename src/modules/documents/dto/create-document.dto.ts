@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, MinLength, MaxLength, IsObject, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  MinLength,
+  MaxLength,
+  IsObject,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateDocumentDto {
   @IsString()

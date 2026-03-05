@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../core/database/prisma.service';
-import { Prisma, Project, ProjectMember, TaskStatus } from '../../../generated/prisma/client';
+import {
+  Prisma,
+  Project,
+  ProjectMember,
+  TaskStatus,
+} from '../../../generated/prisma/client';
 
 const PROJECT_INCLUDE = {
   taskStatuses: {
@@ -16,7 +21,10 @@ export class ProjectsRepository {
     return this.prisma.project.create({ data });
   }
 
-  findAllInOrganization(organizationId: string, userId: string): Promise<Project[]> {
+  findAllInOrganization(
+    organizationId: string,
+    userId: string,
+  ): Promise<Project[]> {
     return this.prisma.project.findMany({
       where: {
         organizationId,
@@ -37,21 +45,29 @@ export class ProjectsRepository {
     });
   }
 
-  findOne(projectId: string): Promise<(Project & { taskStatuses: TaskStatus[] }) | null> {
+  findOne(
+    projectId: string,
+  ): Promise<(Project & { taskStatuses: TaskStatus[] }) | null> {
     return this.prisma.project.findUnique({
       where: { id: projectId },
       include: PROJECT_INCLUDE,
     }) as Promise<(Project & { taskStatuses: TaskStatus[] }) | null>;
   }
 
-  findOneInOrganization(projectId: string, organizationId: string): Promise<Project | null> {
+  findOneInOrganization(
+    projectId: string,
+    organizationId: string,
+  ): Promise<Project | null> {
     return this.prisma.project.findFirst({
       where: { id: projectId, organizationId },
       include: PROJECT_INCLUDE,
     });
   }
 
-  findByNameInOrganization(name: string, organizationId: string): Promise<Project | null> {
+  findByNameInOrganization(
+    name: string,
+    organizationId: string,
+  ): Promise<Project | null> {
     return this.prisma.project.findFirst({
       where: { name, organizationId },
     });
@@ -82,7 +98,10 @@ export class ProjectsRepository {
     return this.prisma.taskStatus.findUnique({ where: { id: statusId } });
   }
 
-  updateTaskStatus(statusId: string, data: Prisma.TaskStatusUpdateInput): Promise<TaskStatus> {
+  updateTaskStatus(
+    statusId: string,
+    data: Prisma.TaskStatusUpdateInput,
+  ): Promise<TaskStatus> {
     return this.prisma.taskStatus.update({ where: { id: statusId }, data });
   }
 
@@ -96,14 +115,21 @@ export class ProjectsRepository {
 
   // --- Project Members ---
 
-  findProjectMember(projectId: string, memberId: string): Promise<ProjectMember | null> {
+  findProjectMember(
+    projectId: string,
+    memberId: string,
+  ): Promise<ProjectMember | null> {
     return this.prisma.projectMember.findFirst({
       where: { projectId, memberId },
     });
   }
 
-  findProjectMemberById(projectMemberId: string): Promise<ProjectMember | null> {
-    return this.prisma.projectMember.findUnique({ where: { id: projectMemberId } });
+  findProjectMemberById(
+    projectMemberId: string,
+  ): Promise<ProjectMember | null> {
+    return this.prisma.projectMember.findUnique({
+      where: { id: projectMemberId },
+    });
   }
 
   findProjectMembers(projectId: string) {

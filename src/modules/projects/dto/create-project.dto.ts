@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateProjectDto {
   @IsString()
@@ -9,6 +15,8 @@ export class CreateProjectDto {
 
   @IsString()
   @IsOptional()
-  @MaxLength(1000, { message: 'Project description must not exceed 1000 characters' })
+  @MaxLength(1000, {
+    message: 'Project description must not exceed 1000 characters',
+  })
   description?: string;
 }

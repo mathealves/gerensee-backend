@@ -33,10 +33,7 @@ export class ProjectsController {
   // --- Projects ---
 
   @Post('organizations/:organizationId/projects')
-  create(
-    @CurrentUser() user: CurrentUserType,
-    @Body() dto: CreateProjectDto,
-  ) {
+  create(@CurrentUser() user: CurrentUserType, @Body() dto: CreateProjectDto) {
     return this.projectsService.create(user, dto);
   }
 

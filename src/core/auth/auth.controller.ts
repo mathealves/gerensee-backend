@@ -7,12 +7,20 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, RefreshTokenDto } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser, type CurrentUserType } from './decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type CurrentUserType,
+} from './decorators/current-user.decorator';
 
 @ApiTags('Auth')
 @Controller('auth')

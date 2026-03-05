@@ -22,7 +22,11 @@ export class DocumentsService {
     private readonly prisma: PrismaService,
   ) {}
 
-  async create(user: CurrentUserType, projectId: string, dto: CreateDocumentDto): Promise<Document> {
+  async create(
+    user: CurrentUserType,
+    projectId: string,
+    dto: CreateDocumentDto,
+  ): Promise<Document> {
     await this.requireProjectAccess(user, projectId);
 
     const content = dto.content ?? EMPTY_DOC_CONTENT;
@@ -51,15 +55,25 @@ export class DocumentsService {
   }
 
   async findOne(user: CurrentUserType, documentId: string): Promise<Document> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     await this.requireProjectAccess(user, doc.projectId);
     return doc;
   }
 
-  async update(user: CurrentUserType, documentId: string, dto: UpdateDocumentDto): Promise<Document> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+  async update(
+    user: CurrentUserType,
+    documentId: string,
+    dto: UpdateDocumentDto,
+  ): Promise<Document> {
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     await this.requireProjectAccess(user, doc.projectId);
@@ -70,10 +84,14 @@ export class DocumentsService {
       const lock = await this.repository.findActiveLock(documentId);
 
       if (!lock) {
-        throw new ForbiddenException('Document must be locked before editing content');
+        throw new ForbiddenException(
+          'Document must be locked before editing content',
+        );
       }
       if (lock.projectMemberId !== pm.id) {
-        throw new ForbiddenException('You do not hold the lock for this document');
+        throw new ForbiddenException(
+          'You do not hold the lock for this document',
+        );
       }
 
       this.validateTiptapContent(dto.content);
@@ -87,7 +105,10 @@ export class DocumentsService {
   }
 
   async delete(user: CurrentUserType, documentId: string): Promise<void> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     await this.requireProjectAccess(user, doc.projectId);
@@ -96,8 +117,14 @@ export class DocumentsService {
 
   // --- Lock Operations ---
 
-  async lockDocument(user: CurrentUserType, documentId: string): Promise<DocumentLock> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+  async lockDocument(
+    user: CurrentUserType,
+    documentId: string,
+  ): Promise<DocumentLock> {
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     await this.requireProjectAccess(user, doc.projectId);
@@ -119,8 +146,14 @@ export class DocumentsService {
     return this.repository.createLock(documentId, pm.id);
   }
 
-  async unlockDocument(user: CurrentUserType, documentId: string): Promise<void> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+  async unlockDocument(
+    user: CurrentUserType,
+    documentId: string,
+  ): Promise<void> {
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     const lock = await this.repository.findActiveLock(documentId);
@@ -128,14 +161,22 @@ export class DocumentsService {
 
     const pm = await this.getProjectMember(user, doc.projectId);
     if (lock.projectMemberId !== pm.id) {
-      throw new ForbiddenException('You do not hold the lock for this document');
+      throw new ForbiddenException(
+        'You do not hold the lock for this document',
+      );
     }
 
     await this.repository.deleteLockByDocument(documentId);
   }
 
-  async extendLock(user: CurrentUserType, documentId: string): Promise<DocumentLock> {
-    const doc = await this.repository.findOneInOrg(documentId, user.organizationId);
+  async extendLock(
+    user: CurrentUserType,
+    documentId: string,
+  ): Promise<DocumentLock> {
+    const doc = await this.repository.findOneInOrg(
+      documentId,
+      user.organizationId,
+    );
     if (!doc) throw new NotFoundException('Document not found');
 
     const lock = await this.repository.findActiveLock(documentId);
@@ -143,7 +184,9 @@ export class DocumentsService {
 
     const pm = await this.getProjectMember(user, doc.projectId);
     if (lock.projectMemberId !== pm.id) {
-      throw new ForbiddenException('You do not hold the lock for this document');
+      throw new ForbiddenException(
+        'You do not hold the lock for this document',
+      );
     }
 
     return this.repository.extendLock(documentId);
@@ -152,8 +195,14 @@ export class DocumentsService {
   // --- Helpers ---
 
   private validateTiptapContent(content: Record<string, unknown>): void {
-    if (typeof content !== 'object' || content === null || content['type'] !== 'doc') {
-      throw new BadRequestException('Content must be a valid Tiptap document JSON with type "doc"');
+    if (
+      typeof content !== 'object' ||
+      content === null ||
+      content['type'] !== 'doc'
+    ) {
+      throw new BadRequestException(
+        'Content must be a valid Tiptap document JSON with type "doc"',
+      );
     }
   }
 
@@ -164,7 +213,10 @@ export class DocumentsService {
     }
   }
 
-  private async requireProjectAccess(user: CurrentUserType, projectId: string): Promise<void> {
+  private async requireProjectAccess(
+    user: CurrentUserType,
+    projectId: string,
+  ): Promise<void> {
     const project = await this.prisma.project.findFirst({
       where: { id: projectId, organizationId: user.organizationId },
     });
@@ -174,13 +226,16 @@ export class DocumentsService {
       const member = await this.prisma.member.findFirst({
         where: { userId: user.id, organizationId: user.organizationId },
       });
-      if (!member) throw new ForbiddenException('Organization membership not found');
+      if (!member)
+        throw new ForbiddenException('Organization membership not found');
 
       const projectMember = await this.prisma.projectMember.findFirst({
         where: { projectId, memberId: member.id },
       });
       if (!projectMember) {
-        throw new ForbiddenException('Access denied: not a member of this project');
+        throw new ForbiddenException(
+          'Access denied: not a member of this project',
+        );
       }
     }
   }
@@ -189,7 +244,8 @@ export class DocumentsService {
     const member = await this.prisma.member.findFirst({
       where: { userId: user.id, organizationId: user.organizationId },
     });
-    if (!member) throw new ForbiddenException('Organization membership not found');
+    if (!member)
+      throw new ForbiddenException('Organization membership not found');
 
     const pm = await this.prisma.projectMember.findFirst({
       where: { projectId, memberId: member.id },

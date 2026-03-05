@@ -1,4 +1,13 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, Min, MinLength } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Matches,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 
 export class CreateTaskStatusDto {
   @IsString()
@@ -13,7 +22,9 @@ export class CreateTaskStatusDto {
 
   @IsString()
   @IsOptional()
-  @Matches(/^#[0-9A-Fa-f]{6}$/, { message: 'Color must be a valid hex color (e.g. #2196F3)' })
+  @Matches(/^#[0-9A-Fa-f]{6}$/, {
+    message: 'Color must be a valid hex color (e.g. #2196F3)',
+  })
   color?: string;
 }
 
@@ -31,6 +42,8 @@ export class UpdateTaskStatusDto {
 
   @IsString()
   @IsOptional()
-  @Matches(/^#[0-9A-Fa-f]{6}$/, { message: 'Color must be a valid hex color (e.g. #2196F3)' })
+  @Matches(/^#[0-9A-Fa-f]{6}$/, {
+    message: 'Color must be a valid hex color (e.g. #2196F3)',
+  })
   color?: string;
 }

@@ -11,29 +11,34 @@ export class OrganizationsRepository {
   }
 
   findAll(userId: string): Promise<Array<Organization & { role: string }>> {
-    return this.prisma.organization.findMany({
-      where: {
-        members: {
-          some: {
-            userId: userId,
+    return this.prisma.organization
+      .findMany({
+        where: {
+          members: {
+            some: {
+              userId: userId,
+            },
           },
         },
-      },
-      include: {
-        members: {
-          where: {
-            userId: userId,
-          },
-          select: {
-            role: true,
+        include: {
+          members: {
+            where: {
+              userId: userId,
+            },
+            select: {
+              role: true,
+            },
           },
         },
-      },
-    }).then(orgs => orgs.map(org => ({
-      ...org,
-      role: org.members[0]?.role || 'MEMBER',
-      members: undefined,
-    })) as any);
+      })
+      .then(
+        (orgs) =>
+          orgs.map((org) => ({
+            ...org,
+            role: org.members[0]?.role || 'MEMBER',
+            members: undefined,
+          })) as any,
+      );
   }
 
   findOne(id: string, userId: string): Promise<Organization | null> {
@@ -49,7 +54,10 @@ export class OrganizationsRepository {
     });
   }
 
-  update(id: string, data: Prisma.OrganizationUpdateInput): Promise<Organization> {
+  update(
+    id: string,
+    data: Prisma.OrganizationUpdateInput,
+  ): Promise<Organization> {
     return this.prisma.organization.update({
       where: { id },
       data,
@@ -97,7 +105,10 @@ export class OrganizationsRepository {
     });
   }
 
-  findMemberByUserAndOrg(userId: string, organizationId: string): Promise<Member | null> {
+  findMemberByUserAndOrg(
+    userId: string,
+    organizationId: string,
+  ): Promise<Member | null> {
     return this.prisma.member.findFirst({
       where: {
         userId,
@@ -121,7 +132,10 @@ export class OrganizationsRepository {
     });
   }
 
-  async updateMember(memberId: string, data: Prisma.MemberUpdateInput): Promise<Member> {
+  async updateMember(
+    memberId: string,
+    data: Prisma.MemberUpdateInput,
+  ): Promise<Member> {
     return this.prisma.member.update({
       where: { id: memberId },
       data,
@@ -161,4 +175,3 @@ export class OrganizationsRepository {
     });
   }
 }
-

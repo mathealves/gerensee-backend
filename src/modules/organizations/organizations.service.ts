@@ -1,11 +1,16 @@
-import { 
-  Injectable, 
-  NotFoundException, 
-  ForbiddenException, 
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
   BadRequestException,
   ConflictException,
 } from '@nestjs/common';
-import type { CreateOrganizationDto, UpdateOrganizationDto, InviteMemberDto, UpdateMemberRoleDto } from './dto';
+import type {
+  CreateOrganizationDto,
+  UpdateOrganizationDto,
+  InviteMemberDto,
+  UpdateMemberRoleDto,
+} from './dto';
 import { OrganizationsRepository } from './repositories/organizations.repository';
 import { Organization, Member, Role } from '../../generated/prisma/client';
 import { PrismaService } from '../../core/database/prisma.service';
@@ -21,7 +26,10 @@ export class OrganizationsService {
   /**
    * Create a new organization with the current user as OWNER
    */
-  async create(user: CurrentUserType, data: CreateOrganizationDto): Promise<Organization> {
+  async create(
+    user: CurrentUserType,
+    data: CreateOrganizationDto,
+  ): Promise<Organization> {
     // Check if user already owns an organization
     const ownershipCount = await this.repository.countUserOwnerships(user.id);
     if (ownershipCount > 0) {
@@ -32,7 +40,7 @@ export class OrganizationsService {
     const existing = await this.prisma.organization.findUnique({
       where: { name: data.name },
     });
-    
+
     if (existing) {
       throw new ConflictException('Organization name already taken');
     }
@@ -43,16 +51,21 @@ export class OrganizationsService {
   /**
    * Get all organizations where the user is a member
    */
-  async findAll(user: CurrentUserType): Promise<Array<Organization & { role: string }>> {
+  async findAll(
+    user: CurrentUserType,
+  ): Promise<Array<Organization & { role: string }>> {
     return this.repository.findAll(user.id);
   }
 
   /**
    * Get a specific organization (requires membership)
    */
-  async findOne(user: CurrentUserType, organizationId: string): Promise<Organization> {
+  async findOne(
+    user: CurrentUserType,
+    organizationId: string,
+  ): Promise<Organization> {
     const organization = await this.repository.findOne(organizationId, user.id);
-    
+
     if (!organization) {
       throw new NotFoundException('Organization not found or access denied');
     }
@@ -79,7 +92,7 @@ export class OrganizationsService {
           id: { not: organizationId },
         },
       });
-      
+
       if (existing) {
         throw new ConflictException('Organization name already taken');
       }
@@ -112,7 +125,10 @@ export class OrganizationsService {
   /**
    * Get all members of an organization
    */
-  async getMembers(user: CurrentUserType, organizationId: string): Promise<Member[]> {
+  async getMembers(
+    user: CurrentUserType,
+    organizationId: string,
+  ): Promise<Member[]> {
     // Verify membership
     await this.requireMembership(user.id, organizationId);
 
@@ -146,7 +162,9 @@ export class OrganizationsService {
     );
 
     if (existingMember) {
-      throw new ConflictException('User is already a member of this organization');
+      throw new ConflictException(
+        'User is already a member of this organization',
+      );
     }
 
     // If inviting as OWNER, enforce the "one OWNER per org" constraint
@@ -159,7 +177,9 @@ export class OrganizationsService {
       }
 
       // Check if user already owns another organization
-      const userOwnershipCount = await this.repository.countUserOwnerships(invitedUser.id);
+      const userOwnershipCount = await this.repository.countUserOwnerships(
+        invitedUser.id,
+      );
       if (userOwnershipCount > 0) {
         throw new BadRequestException('User already owns another organization');
       }
@@ -183,29 +203,38 @@ export class OrganizationsService {
     data: UpdateMemberRoleDto,
   ): Promise<Member> {
     // Verify user has permission
-    const currentUserMember = await this.requireRole(user.id, organizationId, ['OWNER', 'ADMIN']);
+    const currentUserMember = await this.requireRole(user.id, organizationId, [
+      'OWNER',
+      'ADMIN',
+    ]);
 
     // Get the member being updated
     const targetMember = await this.repository.findMemberById(memberId);
-    
+
     if (!targetMember || targetMember.organizationId !== organizationId) {
       throw new NotFoundException('Member not found');
     }
 
     // Prevent self-demotion if you're the OWNER
     if (targetMember.userId === user.id && targetMember.role === 'OWNER') {
-      throw new BadRequestException('Cannot change your own OWNER role. Transfer ownership first.');
+      throw new BadRequestException(
+        'Cannot change your own OWNER role. Transfer ownership first.',
+      );
     }
 
     // Ownership transfer logic
     if (data.role === 'OWNER') {
       // Only current OWNER can transfer ownership
       if (currentUserMember.role !== 'OWNER') {
-        throw new ForbiddenException('Only the current OWNER can transfer ownership');
+        throw new ForbiddenException(
+          'Only the current OWNER can transfer ownership',
+        );
       }
 
       // Check if target user already owns another organization
-      const userOwnershipCount = await this.repository.countUserOwnerships(targetMember.userId);
+      const userOwnershipCount = await this.repository.countUserOwnerships(
+        targetMember.userId,
+      );
       if (userOwnershipCount > 0) {
         throw new BadRequestException('User already owns another organization');
       }
@@ -229,7 +258,9 @@ export class OrganizationsService {
 
     // Regular role change (not to OWNER)
     if (targetMember.role === 'OWNER') {
-      throw new BadRequestException('Cannot demote OWNER. Transfer ownership first.');
+      throw new BadRequestException(
+        'Cannot demote OWNER. Transfer ownership first.',
+      );
     }
 
     return this.repository.updateMember(memberId, { role: data.role });
@@ -248,19 +279,23 @@ export class OrganizationsService {
 
     // Get the member being removed
     const targetMember = await this.repository.findMemberById(memberId);
-    
+
     if (!targetMember || targetMember.organizationId !== organizationId) {
       throw new NotFoundException('Member not found');
     }
 
     // Cannot remove OWNER
     if (targetMember.role === 'OWNER') {
-      throw new BadRequestException('Cannot remove OWNER. Transfer ownership first.');
+      throw new BadRequestException(
+        'Cannot remove OWNER. Transfer ownership first.',
+      );
     }
 
     // Cannot remove yourself if you're the OWNER
     if (targetMember.userId === user.id) {
-      throw new BadRequestException('Cannot remove yourself from the organization');
+      throw new BadRequestException(
+        'Cannot remove yourself from the organization',
+      );
     }
 
     await this.repository.deleteMember(memberId);
@@ -269,11 +304,19 @@ export class OrganizationsService {
   /**
    * Helper: Verify user is a member of the organization
    */
-  private async requireMembership(userId: string, organizationId: string): Promise<Member> {
-    const member = await this.repository.findMemberByUserAndOrg(userId, organizationId);
-    
+  private async requireMembership(
+    userId: string,
+    organizationId: string,
+  ): Promise<Member> {
+    const member = await this.repository.findMemberByUserAndOrg(
+      userId,
+      organizationId,
+    );
+
     if (!member) {
-      throw new ForbiddenException('Access denied: not a member of this organization');
+      throw new ForbiddenException(
+        'Access denied: not a member of this organization',
+      );
     }
 
     return member;
@@ -290,10 +333,11 @@ export class OrganizationsService {
     const member = await this.requireMembership(userId, organizationId);
 
     if (!roles.includes(member.role)) {
-      throw new ForbiddenException(`Access denied: requires one of: ${roles.join(', ')}`);
+      throw new ForbiddenException(
+        `Access denied: requires one of: ${roles.join(', ')}`,
+      );
     }
 
     return member;
   }
 }
-

@@ -103,7 +103,10 @@ export class AuthService {
     }
 
     // Verify password
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -160,7 +163,7 @@ export class AuthService {
     });
 
     // Compare hashes to find matching token (protect against timing attacks)
-    let validToken: typeof tokens[0] | null = null;
+    let validToken: (typeof tokens)[0] | null = null;
     for (const token of tokens) {
       const isMatch = await bcrypt.compare(dto.refreshToken, token.tokenHash);
       if (isMatch) {
@@ -276,7 +279,12 @@ export class AuthService {
         tokenHash: refreshTokenHash,
         userId,
         expiresAt: new Date(
-          Date.now() + parseInt(process.env.JWT_REFRESH_EXPIRATION || '30') * 24 * 60 * 60 * 1000,
+          Date.now() +
+            parseInt(process.env.JWT_REFRESH_EXPIRATION || '30') *
+              24 *
+              60 *
+              60 *
+              1000,
         ),
       },
     });

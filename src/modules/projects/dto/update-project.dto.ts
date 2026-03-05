@@ -9,6 +9,8 @@ export class UpdateProjectDto {
 
   @IsString()
   @IsOptional()
-  @MaxLength(1000, { message: 'Project description must not exceed 1000 characters' })
+  @MaxLength(1000, {
+    message: 'Project description must not exceed 1000 characters',
+  })
   description?: string;
 }

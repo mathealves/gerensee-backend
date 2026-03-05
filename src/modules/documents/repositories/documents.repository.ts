@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma, Document, DocumentLock } from '../../../generated/prisma/client';
+import {
+  Prisma,
+  Document,
+  DocumentLock,
+} from '../../../generated/prisma/client';
 import { PrismaService } from '../../../core/database/prisma.service';
 
 const LOCK_INCLUDE = {
@@ -80,19 +84,31 @@ export class DocumentsRepository {
     });
   }
 
-  findOneInOrg(documentId: string, organizationId: string): Promise<Document | null> {
+  findOneInOrg(
+    documentId: string,
+    organizationId: string,
+  ): Promise<Document | null> {
     return this.prisma.document.findFirst({
       where: { id: documentId, organizationId },
       include: DOCUMENT_INCLUDE,
     });
   }
 
-  update(documentId: string, data: Prisma.DocumentUncheckedUpdateInput): Promise<Document> {
-    return this.prisma.document.update({ where: { id: documentId }, data, include: DOCUMENT_INCLUDE });
+  update(
+    documentId: string,
+    data: Prisma.DocumentUncheckedUpdateInput,
+  ): Promise<Document> {
+    return this.prisma.document.update({
+      where: { id: documentId },
+      data,
+      include: DOCUMENT_INCLUDE,
+    });
   }
 
   async delete(documentId: string, deletedBy: string): Promise<Document> {
-    const doc = await this.prisma.document.delete({ where: { id: documentId } });
+    const doc = await this.prisma.document.delete({
+      where: { id: documentId },
+    });
     await this.prisma.documentDeletionLog.create({
       data: { documentId, deletedBy },
     });
@@ -111,7 +127,10 @@ export class DocumentsRepository {
     });
   }
 
-  createLock(documentId: string, projectMemberId: string): Promise<DocumentLock> {
+  createLock(
+    documentId: string,
+    projectMemberId: string,
+  ): Promise<DocumentLock> {
     const expiresAt = new Date(Date.now() + LOCK_DURATION_MS);
     return this.prisma.documentLock.create({
       data: { documentId, projectMemberId, expiresAt },
