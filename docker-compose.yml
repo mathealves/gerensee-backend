@@ -22,21 +22,20 @@ services:
       timeout: 2s
       retries: 20
 
-#  server:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    ports:
-#      - '3000:3000'
-#    stdin_open: true
-#    tty: true  # Keeps the container running for debugging
-#    depends_on:
-#      postgres_db:
-#        condition: service_healthy
-#    env_file:
-#      - .env.prod
-#    networks:
-#      - prisma-network
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gerensee_backend
+    ports:
+      - '${NEST_PORT:-3000}:3000'
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - prisma-network
 
 volumes:
   postgres_data:

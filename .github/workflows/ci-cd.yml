@@ -1,0 +1,122 @@
+# Required GitHub Actions secrets (Settings → Secrets and variables → Actions):
+#   AWS_ACCOUNT_ID         — your 12-digit AWS account ID
+#   RAILWAY_DEPLOY_HOOK_URL — from Railway: service → Settings → Deploy → Deploy Hook
+#
+# Required AWS setup (one-time, manual):
+#   1. Create an OIDC identity provider in IAM:
+#        Provider URL: https://token.actions.githubusercontent.com
+#        Audience:     sts.amazonaws.com
+#   2. Run `terraform apply` — it will create the github-actions-ecr-push IAM role.
+#   3. Copy the role ARN from `terraform output github_actions_role_arn` into
+#      the role-to-assume field below (or store as a secret).
+
+name: CI/CD — Backend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: gerensee/backend
+
+jobs:
+  # ─── Job 1: Lint & Test ───────────────────────────────────────────────────
+  lint-test:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm tsc --noEmit
+
+      - name: Unit tests
+        run: pnpm test --passWithNoTests
+
+  # ─── Job 2: Build & Push to ECR ──────────────────────────────────────────
+  build-push:
+    name: Build & Push to ECR
+    runs-on: ubuntu-latest
+    needs: lint-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    permissions:
+      id-token: write  # Required for OIDC authentication with AWS
+      contents: read
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.sha-tag }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC — no long-lived keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecr-push
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Generate image metadata
+        id: meta
+        run: |
+          SHA_TAG=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "sha-tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:latest
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha-tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ─── Job 3: Deploy to Railway ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: build-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Trigger Railway deployment
+        run: |
+          curl --fail -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK_URL }}" \
+            -H "Content-Type: application/json"
+
+      - name: Deployment summary
+        run: |
+          echo "### Deployment triggered" >> $GITHUB_STEP_SUMMARY
+          echo "- **Image tag:** \`${{ needs.build-push.outputs.image-tag }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **ECR repo:** \`${{ env.ECR_REPOSITORY }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Railway:** deploy hook triggered" >> $GITHUB_STEP_SUMMARY
