@@ -12,6 +12,7 @@ import { OrganizationsModule } from './modules/organizations/organizations.modul
 import { ProjectsModule } from './modules/projects/projects.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { DocumentsModule } from './modules/documents/documents.module';
+import { HealthController } from './core/health/health.controller';
 import * as Joi from 'joi';
 
 @Module({
@@ -24,10 +25,12 @@ import * as Joi from 'joi';
           .valid('development', 'production', 'test', 'provision')
           .default('development'),
         DATABASE_URL: Joi.string().uri().required(),
-        POSTGRES_DB: Joi.string().required(),
-        POSTGRES_USER: Joi.string().required(),
-        POSTGRES_PASSWORD: Joi.string().required(),
-        POSTGRES_PORT: Joi.number().port().required(),
+        // Individual Postgres vars are only needed locally (docker-compose).
+        // In production (ECS), DATABASE_URL is sufficient.
+        POSTGRES_DB: Joi.string().optional(),
+        POSTGRES_USER: Joi.string().optional(),
+        POSTGRES_PASSWORD: Joi.string().optional(),
+        POSTGRES_PORT: Joi.number().port().optional(),
         NEST_PORT: Joi.number().default(3000),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRATION: Joi.string().default('15m'),
@@ -44,7 +47,7 @@ import * as Joi from 'joi';
     TasksModule,
     DocumentsModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [
     {
       provide: APP_FILTER,
