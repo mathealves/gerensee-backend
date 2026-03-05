@@ -23,23 +23,6 @@ const DOCUMENT_INCLUDE = {
   lock: { include: LOCK_INCLUDE },
 };
 
-const DOCUMENT_SUMMARY_INCLUDE = {
-  createdBy: { select: { id: true, name: true } },
-  lock: {
-    include: {
-      projectMember: {
-        include: {
-          member: {
-            include: {
-              user: { select: { name: true } },
-            },
-          },
-        },
-      },
-    },
-  },
-};
-
 const LOCK_DURATION_MS = 15 * 60 * 1000; // 15 minutes
 
 @Injectable()

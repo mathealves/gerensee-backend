@@ -34,7 +34,7 @@ export class ProjectsService {
     user: CurrentUserType,
     dto: CreateProjectDto,
   ): Promise<Project & { taskStatuses: TaskStatus[] }> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
 
     // Check for duplicate project name in organization
     const existing = await this.repository.findByNameInOrganization(
@@ -121,7 +121,7 @@ export class ProjectsService {
     projectId: string,
     dto: UpdateProjectDto,
   ): Promise<Project> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
     if (dto.name) {
@@ -140,7 +140,7 @@ export class ProjectsService {
   }
 
   async delete(user: CurrentUserType, projectId: string): Promise<void> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
     await this.repository.delete(projectId);
   }
@@ -160,7 +160,7 @@ export class ProjectsService {
     projectId: string,
     dto: CreateTaskStatusDto,
   ): Promise<TaskStatus> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
     let position = dto.position;
@@ -186,7 +186,7 @@ export class ProjectsService {
     statusId: string,
     dto: UpdateTaskStatusDto,
   ): Promise<TaskStatus> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
     await this.requireStatusInProject(statusId, projectId);
 
@@ -198,7 +198,7 @@ export class ProjectsService {
     projectId: string,
     statusId: string,
   ): Promise<void> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
     await this.requireStatusInProject(statusId, projectId);
 
@@ -222,7 +222,7 @@ export class ProjectsService {
     projectId: string,
     dto: AddProjectMemberDto,
   ) {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
     // Resolve userId → Member (must be in same org)
@@ -255,7 +255,7 @@ export class ProjectsService {
     projectId: string,
     projectMemberId: string,
   ): Promise<void> {
-    await this.requireRole(user, ['OWNER', 'ADMIN']);
+    this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
     const pm = await this.repository.findProjectMemberById(projectMemberId);
@@ -272,10 +272,7 @@ export class ProjectsService {
     return role === 'OWNER' || role === 'ADMIN';
   }
 
-  private async requireRole(
-    user: CurrentUserType,
-    roles: Role[],
-  ): Promise<void> {
+  private requireRole(user: CurrentUserType, roles: Role[]): void {
     if (!roles.includes(user.role as Role)) {
       throw new ForbiddenException(
         `Access denied: requires one of: ${roles.join(', ')}`,

@@ -18,7 +18,7 @@ import {
 } from './dto';
 import { OrganizationsService } from './organizations.service';
 import { Organization, Member } from '../../generated/prisma/client';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../core/auth/guards/jwt-auth.guard';
 import {
   CurrentUser,

@@ -37,7 +37,7 @@ export class OrganizationsRepository {
             ...org,
             role: org.members[0]?.role || 'MEMBER',
             members: undefined,
-          })) as any,
+          })) as Array<Organization & { role: string }>,
       );
   }
 

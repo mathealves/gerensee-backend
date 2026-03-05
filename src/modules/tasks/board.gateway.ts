@@ -8,6 +8,10 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+
+interface SocketData {
+  user?: CurrentUserType;
+}
 import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../core/database/prisma.service';
@@ -48,7 +52,7 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
 
       // Attach user to socket for later use
-      client.data.user = {
+      (client.data as SocketData).user = {
         id: payload.sub,
         email: payload.email,
         organizationId: payload.organizationId,
@@ -72,7 +76,7 @@ export class BoardGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody() data: { projectId: string },
   ): Promise<void> {
-    const user: CurrentUserType = client.data.user;
+    const user = (client.data as SocketData).user;
     if (!user) {
       client.emit('error', {
         message: 'Not authenticated',

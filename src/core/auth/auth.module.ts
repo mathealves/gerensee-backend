@@ -20,12 +20,14 @@ import type { StringValue } from 'ms';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const expiresIn = (configService.get<string>('JWT_ACCESS_EXPIRATION') ||
           '15m') as StringValue;
         return {
           global: true,
           secret: configService.get<string>('JWT_ACCESS_SECRET') as string,
           signOptions: {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             expiresIn,
           },
         };

@@ -136,7 +136,10 @@ export class DocumentsService {
         // Already locked by this user — extend and return
         return this.repository.extendLock(documentId);
       }
-      const lockerUser = (existingLock as any).projectMember?.member?.user;
+      const lockWithMember = existingLock as DocumentLock & {
+        projectMember?: { member?: { user?: { name?: string | null } } };
+      };
+      const lockerUser = lockWithMember.projectMember?.member?.user;
       const lockerName = lockerUser?.name ?? 'another user';
       throw new ConflictException(
         `Document is locked by ${lockerName} until ${existingLock.expiresAt.toISOString()}`,
