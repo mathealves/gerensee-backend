@@ -17,8 +17,9 @@ export class CreateTaskStatusDto {
   name: string;
 
   @IsInt()
+  @IsOptional()
   @Min(0)
-  position: number;
+  position?: number;
 
   @IsString()
   @IsOptional()

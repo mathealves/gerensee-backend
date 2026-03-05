@@ -163,10 +163,19 @@ export class ProjectsService {
     await this.requireRole(user, ['OWNER', 'ADMIN']);
     await this.requireProjectInOrg(projectId, user.organizationId);
 
+    let position = dto.position;
+    if (position === undefined) {
+      const existing = await this.repository.findTaskStatuses(projectId);
+      position =
+        existing.length > 0
+          ? Math.max(...existing.map((s) => s.position)) + 1
+          : 0;
+    }
+
     return this.repository.createTaskStatus({
       name: dto.name,
       color: dto.color,
-      position: dto.position,
+      position,
       project: { connect: { id: projectId } },
     });
   }
