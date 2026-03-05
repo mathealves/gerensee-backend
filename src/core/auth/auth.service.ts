@@ -138,6 +138,7 @@ export class AuthService {
       organization: {
         id: membership.organization.id,
         name: membership.organization.name,
+        role: membership.role,
       },
     };
   }
