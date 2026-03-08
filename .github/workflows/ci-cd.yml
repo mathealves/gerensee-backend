@@ -56,67 +56,67 @@ jobs:
         run: pnpm test --passWithNoTests
 
   # ─── Job 2: Build & Push to ECR ──────────────────────────────────────────
-  build-push:
-    name: Build & Push to ECR
-    runs-on: ubuntu-latest
-    needs: lint-test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  # build-push:
+  #   name: Build & Push to ECR
+  #   runs-on: ubuntu-latest
+  #   needs: lint-test
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    permissions:
-      id-token: write  # Required for OIDC authentication with AWS
-      contents: read
+  #   permissions:
+  #     id-token: write  # Required for OIDC authentication with AWS
+  #     contents: read
 
-    outputs:
-      image-tag: ${{ steps.meta.outputs.sha-tag }}
+  #   outputs:
+  #     image-tag: ${{ steps.meta.outputs.sha-tag }}
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: Configure AWS credentials (OIDC — no long-lived keys)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecr-push
-          aws-region: ${{ env.AWS_REGION }}
+  #     - name: Configure AWS credentials (OIDC — no long-lived keys)
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-ecr-push
+  #         aws-region: ${{ env.AWS_REGION }}
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+  #     - name: Login to Amazon ECR
+  #       id: login-ecr
+  #       uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Generate image metadata
-        id: meta
-        run: |
-          SHA_TAG=$(echo "${{ github.sha }}" | cut -c1-7)
-          echo "sha-tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
-          echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}" >> "$GITHUB_OUTPUT"
+  #     - name: Generate image metadata
+  #       id: meta
+  #       run: |
+  #         SHA_TAG=$(echo "${{ github.sha }}" | cut -c1-7)
+  #         echo "sha-tag=${SHA_TAG}" >> "$GITHUB_OUTPUT"
+  #         echo "image=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ steps.meta.outputs.image }}:latest
-            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha-tag }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v5
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: |
+  #           ${{ steps.meta.outputs.image }}:latest
+  #           ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.sha-tag }}
+  #         cache-from: type=gha
+  #         cache-to: type=gha,mode=max
 
   # ─── Job 3: Deploy to Railway ─────────────────────────────────────────────
-  deploy:
-    name: Deploy to Railway
-    runs-on: ubuntu-latest
-    needs: build-push
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  # deploy:
+  #   name: Deploy to Railway
+  #   runs-on: ubuntu-latest
+  #   needs: build-push
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    steps:
-      - name: Trigger Railway deployment
-        run: |
-          curl --fail -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK_URL }}" \
-            -H "Content-Type: application/json"
+  #   steps:
+  #     - name: Trigger Railway deployment
+  #       run: |
+  #         curl --fail -X POST "${{ secrets.RAILWAY_DEPLOY_HOOK_URL }}" \
+  #           -H "Content-Type: application/json"
 
-      - name: Deployment summary
-        run: |
-          echo "### Deployment triggered" >> $GITHUB_STEP_SUMMARY
-          echo "- **Image tag:** \`${{ needs.build-push.outputs.image-tag }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **ECR repo:** \`${{ env.ECR_REPOSITORY }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **Railway:** deploy hook triggered" >> $GITHUB_STEP_SUMMARY
+  #     - name: Deployment summary
+  #       run: |
+  #         echo "### Deployment triggered" >> $GITHUB_STEP_SUMMARY
+  #         echo "- **Image tag:** \`${{ needs.build-push.outputs.image-tag }}\`" >> $GITHUB_STEP_SUMMARY
+  #         echo "- **ECR repo:** \`${{ env.ECR_REPOSITORY }}\`" >> $GITHUB_STEP_SUMMARY
+  #         echo "- **Railway:** deploy hook triggered" >> $GITHUB_STEP_SUMMARY
