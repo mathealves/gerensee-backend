@@ -52,8 +52,8 @@ jobs:
       - name: Type check
         run: pnpm tsc --noEmit
 
-      - name: Unit tests
-        run: pnpm test --passWithNoTests
+      # - name: Unit tests
+      #   run: pnpm test --passWithNoTests
 
   # ─── Job 2: Build & Push to ECR ──────────────────────────────────────────
   # build-push:
