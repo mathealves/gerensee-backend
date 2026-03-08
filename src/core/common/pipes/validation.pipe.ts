@@ -9,6 +9,7 @@ import { validate } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 
 @Injectable()
+// Global pipes are used across the whole application, for every controller and every route handler. Such as this one which is imported in app.module.ts and used as a global pipe.
 export class ValidationPipe implements PipeTransform<unknown> {
   async transform(
     value: any,
@@ -18,7 +19,7 @@ export class ValidationPipe implements PipeTransform<unknown> {
       return value;
     }
 
-    const object = plainToInstance(metatype as Type<unknown>, value as object);
+    const object = plainToInstance(metatype as Type<object>, value as object);
     const errors = await validate(object);
 
     if (errors.length > 0) {

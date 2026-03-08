@@ -25,8 +25,6 @@ import * as Joi from 'joi';
           .valid('development', 'production', 'test', 'provision')
           .default('development'),
         DATABASE_URL: Joi.string().uri().required(),
-        // Individual Postgres vars are only needed locally (docker-compose).
-        // In production (ECS), DATABASE_URL is sufficient.
         POSTGRES_DB: Joi.string().optional(),
         POSTGRES_USER: Joi.string().optional(),
         POSTGRES_PASSWORD: Joi.string().optional(),
